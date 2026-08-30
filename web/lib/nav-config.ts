@@ -20,6 +20,7 @@ export const NAV_BY_ROLE: Record<AppRole, NavItem[]> = {
   ],
   psicologo: [
     { label: 'Agenda', href: '/dashboard', icon: 'calendar' },
+    { label: 'Meu perfil profissional', href: '/perfil-psicologo', icon: 'settings' },
     { label: 'Pacientes', href: '/pacientes', icon: 'users' },
     { label: 'Prontuários', href: '/prontuarios', icon: 'file' },
     { label: 'Financeiro', href: '/financeiro', icon: 'card' },
@@ -38,3 +39,4 @@ export const ROLE_LABEL: Record<AppRole, string> = {
   psicologo: 'Psicólogo',
   admin_plataforma: 'Admin da plataforma',
 }
+
