@@ -47,6 +47,14 @@ A única porta de acesso da empresa a qualquer dado derivado de sessão é a
 função `corporate.get_indicadores_empresa()`, que embute a proteção de
 grupo mínimo diretamente na consulta SQL.
 
+Operações que envolvem múltiplas tabelas ou regras de negócio sensíveis
+(criar empresa, adicionar colaborador por e-mail) são encapsuladas em
+funções `security definer` (ex: `corporate.criar_empresa()`,
+`corporate.adicionar_colaborador_por_email()`) em vez de policies de
+INSERT diretas — isso evita espalhar lógica de negócio pela RLS e permite
+consultar `auth.users` (normalmente inacessível ao cliente) de forma
+controlada.
+
 ## Estado atual (testado de ponta a ponta)
 
 ✅ Schema completo aplicado via migrations versionadas (`supabase/migrations/`)
@@ -57,6 +65,9 @@ grupo mínimo diretamente na consulta SQL.
   de atuação, valor da sessão)
 ✅ Colaborador: busca de psicólogos, agendamento de sessão com cálculo
   automático do rateio financeiro, lista de agendamentos
+✅ Empresa: cadastro da própria empresa (nome, CNPJ, modalidade de
+  financiamento), gestão de colaboradores elegíveis (adicionar por e-mail,
+  listar com status)
 
 ### Bugs reais encontrados e corrigidos durante o desenvolvimento
 
@@ -75,14 +86,15 @@ Vale documentar porque são armadilhas comuns de RLS no Postgres/Supabase:
    view herdar a RLS da tabela por trás (`clinical.psicologos`, que só
    permite cada psicólogo ver o próprio registro), deixando a busca
    sempre vazia para qualquer colaborador. Corrigido removendo essa opção.
+4. **Perfis de colaboradores invisíveis para o RH:** a policy original de
+   `profiles` só permitia ver o próprio registro (ou admin da plataforma),
+   então a tela de gestão de colaboradores não conseguia mostrar nome/
+   e-mail de ninguém. Corrigido com uma policy adicional que libera a
+   visualização quando existe vínculo de colaborador elegível na mesma
+   empresa do admin que está consultando.
 
 ## O que ainda falta (gaps conhecidos)
 
-- **Onboarding de empresa:** hoje a criação de uma empresa e o vínculo de
-  colaboradores elegíveis foi feito manualmente via SQL Editor para fins
-  de teste. Falta a tela onde o `empresa_admin` cadastra a própria
-  empresa (nome, CNPJ, modalidade de financiamento) e adiciona
-  colaboradores.
 - **Cobrança/billing:** a mensalidade do psicólogo (R$ 150) e o pagamento
   da sessão ainda não têm Edge Functions de integração com gateway de
   pagamento. Hoje a ativação da assinatura (`status_assinatura = 'ativa'`)
@@ -102,6 +114,10 @@ Vale documentar porque são armadilhas comuns de RLS no Postgres/Supabase:
   (`core.registrar_acesso_clinico()`) pronta para ser chamada
   explicitamente pela aplicação a cada leitura de prontuário, mas ainda
   não está integrada em nenhuma tela.
+- **Convite de colaborador antes do cadastro:** hoje o RH só consegue
+  adicionar um colaborador que já existe na plataforma (com conta criada
+  e papel "colaborador"). Não existe fluxo de convite por e-mail para
+  quem ainda não tem conta.
 
 ## Questões regulatórias em aberto (LGPD/CFP)
 
