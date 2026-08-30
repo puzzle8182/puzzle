@@ -1,26 +1,51 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #17242a;
+  --ink-soft: #5c6b66;
+  --paper: #f5f3ee;
+  --pine: #2c4a46;
+  --pine-dark: #1f3532;
+  --sage: #9cbbab;
+  --amber: #c89b3c;
+  --border-soft: #e3ded2;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paper: var(--paper);
+  --color-pine: var(--pine);
+  --color-pine-dark: var(--pine-dark);
+  --color-sage: var(--sage);
+  --color-amber: var(--amber);
+  --color-border-soft: var(--border-soft);
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-inter);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.brand-pulse {
+  animation: brand-pulse 2.6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes brand-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.85); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-pulse {
+    animation: none;
+  }
 }
