@@ -19,6 +19,7 @@ export async function salvarPerfilPsicologo(formData: FormData) {
   const abordagem = (formData.get('abordagem') as string)?.trim()
   const areasRaw = (formData.get('areasAtuacao') as string)?.trim()
   const valorSessao = Number(formData.get('valorSessao'))
+  const disponibilidadeRaw = formData.get('disponibilidade') as string
 
   if (!crp) {
     return { error: 'O CRP é obrigatório.' }
@@ -31,6 +32,13 @@ export async function salvarPerfilPsicologo(formData: FormData) {
     ? areasRaw.split(',').map((a) => a.trim()).filter(Boolean)
     : []
 
+  let disponibilidade: unknown = []
+  try {
+    disponibilidade = disponibilidadeRaw ? JSON.parse(disponibilidadeRaw) : []
+  } catch {
+    disponibilidade = []
+  }
+
   const { error } = await supabase
     .schema('clinical')
     .from('psicologos')
@@ -42,12 +50,12 @@ export async function salvarPerfilPsicologo(formData: FormData) {
         abordagem,
         areas_atuacao: areasAtuacao,
         valor_sessao: valorSessao,
+        disponibilidade,
       },
       { onConflict: 'id' }
     )
 
   if (error) {
-    // CRP é único — erro de violação de constraint vira mensagem amigável
     if (error.code === '23505') {
       return { error: 'Esse CRP já está cadastrado por outra conta.' }
     }

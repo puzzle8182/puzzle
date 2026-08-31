@@ -13,7 +13,7 @@ export default async function PsicologoPerfilPage({
   const { data: psicologo } = await supabase
     .schema('clinical')
     .from('psicologos_busca')
-    .select('id, bio, abordagem, areas_atuacao, valor_sessao')
+    .select('id, bio, abordagem, areas_atuacao, valor_sessao, disponibilidade')
     .eq('id', id)
     .single()
 
@@ -50,7 +50,11 @@ export default async function PsicologoPerfilPage({
 
       <div className="mt-8 border-t border-border-soft pt-6">
         {financiamento ? (
-          <BookingForm psicologoId={psicologo.id} valorSessao={psicologo.valor_sessao} />
+          <BookingForm
+            psicologoId={psicologo.id}
+            valorSessao={psicologo.valor_sessao}
+            disponibilidade={psicologo.disponibilidade}
+          />
         ) : (
           <div className="rounded-lg bg-amber/10 border border-amber/30 px-4 py-3 text-sm text-ink">
             Você ainda não está vinculado a uma empresa na plataforma. Peça

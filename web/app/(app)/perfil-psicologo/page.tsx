@@ -24,7 +24,9 @@ export default async function PerfilPsicologoPage() {
   const { data: perfil } = await supabase
     .schema('clinical')
     .from('psicologos')
-    .select('crp, bio, abordagem, areas_atuacao, valor_sessao, status_assinatura')
+    .select(
+      'crp, bio, abordagem, areas_atuacao, valor_sessao, status_assinatura, disponibilidade'
+    )
     .eq('id', user.id)
     .single()
 

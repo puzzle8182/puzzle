@@ -62,12 +62,16 @@ controlada.
 ✅ Layout com sidebar adaptável por papel
 ✅ Cadastro/login/logout
 ✅ Psicólogo: formulário de perfil profissional (CRP, abordagem, bio, áreas
-  de atuação, valor da sessão)
-✅ Colaborador: busca de psicólogos, agendamento de sessão com cálculo
-  automático do rateio financeiro, lista de agendamentos
+  de atuação, valor da sessão) + editor de disponibilidade semanal
+✅ Colaborador: busca de psicólogos, agendamento de sessão restrito aos
+  horários reais de disponibilidade do psicólogo, com cálculo automático
+  do rateio financeiro, lista de agendamentos
 ✅ Empresa: cadastro da própria empresa (nome, CNPJ, modalidade de
   financiamento), gestão de colaboradores elegíveis (adicionar por e-mail,
   listar com status)
+✅ Prontuário clínico: psicólogo vê lista de pacientes (colaboradores com
+  quem já teve sessão), registra uma nota por sessão, com log de auditoria
+  de acesso
 
 ### Bugs reais encontrados e corrigidos durante o desenvolvimento
 
@@ -92,6 +96,10 @@ Vale documentar porque são armadilhas comuns de RLS no Postgres/Supabase:
    e-mail de ninguém. Corrigido com uma policy adicional que libera a
    visualização quando existe vínculo de colaborador elegível na mesma
    empresa do admin que está consultando.
+5. **Perfis de pacientes invisíveis para o psicólogo:** mesmo padrão do
+   bug anterior — o psicólogo não conseguia ver nome/e-mail dos próprios
+   pacientes. Corrigido com policy análoga baseada em vínculo de
+   agendamento.
 
 ## O que ainda falta (gaps conhecidos)
 
@@ -103,21 +111,21 @@ Vale documentar porque são armadilhas comuns de RLS no Postgres/Supabase:
   do Supabase para agilizar testes — **reativar antes de qualquer uso
   real**, e configurar um provedor de e-mail transacional (o padrão do
   Supabase é só para testes, com limite de envio baixo).
-- **Prontuário clínico:** o registro de notas de sessão
-  (`clinical.notas_sessao`) e objetivos terapêuticos existe no banco, mas
-  ainda não tem interface no frontend.
-- **Disponibilidade de horário do psicólogo:** o agendamento hoje aceita
-  qualquer data/hora digitada pelo colaborador, sem checar a
-  disponibilidade real cadastrada pelo psicólogo (`disponibilidade` jsonb
-  existe na tabela, mas não é usado ainda).
-- **Auditoria de leitura de prontuário:** existe uma função
-  (`core.registrar_acesso_clinico()`) pronta para ser chamada
-  explicitamente pela aplicação a cada leitura de prontuário, mas ainda
-  não está integrada em nenhuma tela.
+- **Conflito de horário na agenda:** a validação hoje garante que o
+  horário está dentro da disponibilidade declarada pelo psicólogo, mas
+  não impede que dois colaboradores agendem o mesmo horário exato (falta
+  checar se já existe um agendamento conflitante naquele slot).
 - **Convite de colaborador antes do cadastro:** hoje o RH só consegue
   adicionar um colaborador que já existe na plataforma (com conta criada
   e papel "colaborador"). Não existe fluxo de convite por e-mail para
   quem ainda não tem conta.
+- **Indicadores da empresa no frontend:** a função
+  `corporate.get_indicadores_empresa()` existe e tem proteção de grupo
+  mínimo, mas ainda não tem tela no frontend (`/indicadores` na sidebar
+  ainda não foi implementada).
+- **Financeiro do psicólogo no frontend:** idem — a tabela
+  `core.pagamentos_sessao` existe, mas a tela `/financeiro` ainda não
+  mostra nada.
 
 ## Questões regulatórias em aberto (LGPD/CFP)
 
