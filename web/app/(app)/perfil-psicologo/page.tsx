@@ -25,7 +25,7 @@ export default async function PerfilPsicologoPage() {
     .schema('clinical')
     .from('psicologos')
     .select(
-      'crp, bio, abordagem, areas_atuacao, valor_sessao, status_assinatura, disponibilidade'
+      'crp, bio, abordagem, areas_atuacao, valor_sessao, status_assinatura, status_verificacao, documento_url, disponibilidade'
     )
     .eq('id', user.id)
     .single()

@@ -13,6 +13,8 @@ type PerfilExistente = {
   areas_atuacao: string[] | null
   valor_sessao: number
   status_assinatura: string
+  status_verificacao: string
+  documento_url: string | null
   disponibilidade: DisponibilidadeItem[] | null
 } | null
 
@@ -30,6 +32,12 @@ const HORARIOS_PADRAO = [
   '08:00', '09:00', '10:00', '11:00', '12:00', '13:00',
   '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
 ]
+
+const VERIFICACAO_LABEL: Record<string, string> = {
+  pendente: 'Em análise',
+  aprovado: 'Aprovado',
+  rejeitado: 'Rejeitado — reenvie o documento',
+}
 
 function disponibilidadeParaMapa(
   disponibilidade: DisponibilidadeItem[] | null
@@ -89,11 +97,27 @@ export function PsicologoProfileForm({ perfil }: { perfil: PerfilExistente }) {
   return (
     <div className="max-w-2xl">
       {perfil && (
-        <div className="mb-6 rounded-lg bg-sage/15 border border-sage/40 px-4 py-3 text-sm text-ink">
-          Status da assinatura:{' '}
-          <strong className="capitalize">{perfil.status_assinatura}</strong>.{' '}
-          {perfil.status_assinatura !== 'ativa' &&
-            'Seu perfil só aparece na busca de colaboradores quando a assinatura estiver ativa.'}
+        <div className="mb-6 flex flex-col gap-2">
+          <div className="rounded-lg bg-sage/15 border border-sage/40 px-4 py-3 text-sm text-ink">
+            Status da assinatura:{' '}
+            <strong className="capitalize">{perfil.status_assinatura}</strong>.{' '}
+            {perfil.status_assinatura !== 'ativa' &&
+              'Seu perfil só aparece na busca quando a assinatura estiver ativa.'}
+          </div>
+          <div
+            className={`rounded-lg border px-4 py-3 text-sm text-ink ${
+              perfil.status_verificacao === 'aprovado'
+                ? 'bg-sage/15 border-sage/40'
+                : perfil.status_verificacao === 'rejeitado'
+                  ? 'bg-red-50 border-red-200'
+                  : 'bg-amber/10 border-amber/30'
+            }`}
+          >
+            Documentação:{' '}
+            <strong>{VERIFICACAO_LABEL[perfil.status_verificacao] ?? perfil.status_verificacao}</strong>.{' '}
+            {perfil.status_verificacao !== 'aprovado' &&
+              'Um responsável técnico precisa aprovar seu CRP antes do seu perfil aparecer na busca.'}
+          </div>
         </div>
       )}
 
@@ -110,6 +134,24 @@ export function PsicologoProfileForm({ perfil }: { perfil: PerfilExistente }) {
             defaultValue={perfil?.crp ?? ''}
             placeholder="Ex: 06/123456"
             className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="documento" className="text-sm text-ink-soft block mb-1.5">
+            Comprovante do CRP (PDF ou imagem)
+          </label>
+          {perfil?.documento_url && (
+            <p className="text-xs text-ink-soft mb-1.5">
+              Documento já enviado. Envie um novo arquivo aqui apenas se quiser substituí-lo.
+            </p>
+          )}
+          <input
+            id="documento"
+            name="documento"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage file:mr-3 file:rounded-md file:border-0 file:bg-sage/20 file:px-3 file:py-1.5 file:text-pine"
           />
         </div>
 

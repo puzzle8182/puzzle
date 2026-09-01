@@ -72,6 +72,10 @@ controlada.
 ✅ Prontuário clínico: psicólogo vê lista de pacientes (colaboradores com
   quem já teve sessão), registra uma nota por sessão, com log de auditoria
   de acesso
+✅ Verificação de documentação: psicólogo envia comprovante do CRP
+  (upload para Supabase Storage, bucket privado); responsável técnico
+  (papel `admin_plataforma`) aprova ou rejeita antes do perfil aparecer
+  na busca — separado do status de assinatura (financeiro)
 
 ### Bugs reais encontrados e corrigidos durante o desenvolvimento
 
@@ -126,6 +130,11 @@ Vale documentar porque são armadilhas comuns de RLS no Postgres/Supabase:
 - **Financeiro do psicólogo no frontend:** idem — a tabela
   `core.pagamentos_sessao` existe, mas a tela `/financeiro` ainda não
   mostra nada.
+- **Criação de conta `admin_plataforma` é manual:** não existe fluxo de
+  convite seguro — hoje a pessoa se cadastra com qualquer papel e depois
+  alguém com acesso ao banco roda um `UPDATE` no SQL Editor pra promover
+  a conta. Funciona para um responsável técnico único, mas não escala
+  para múltiplos admins nem tem trilha de auditoria de quem promoveu quem.
 
 ## Questões regulatórias em aberto (LGPD/CFP)
 

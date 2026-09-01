@@ -20,6 +20,7 @@ export async function salvarPerfilPsicologo(formData: FormData) {
   const areasRaw = (formData.get('areasAtuacao') as string)?.trim()
   const valorSessao = Number(formData.get('valorSessao'))
   const disponibilidadeRaw = formData.get('disponibilidade') as string
+  const arquivo = formData.get('documento') as File | null
 
   if (!crp) {
     return { error: 'O CRP é obrigatório.' }
@@ -39,21 +40,40 @@ export async function salvarPerfilPsicologo(formData: FormData) {
     disponibilidade = []
   }
 
+  const payload: Record<string, unknown> = {
+    id: user.id,
+    crp,
+    bio,
+    abordagem,
+    areas_atuacao: areasAtuacao,
+    valor_sessao: valorSessao,
+    disponibilidade,
+  }
+
+  // Só mexe no documento se um arquivo novo foi de fato enviado —
+  // sem isso, o campo existente não é tocado.
+  if (arquivo && arquivo.size > 0) {
+    const extensao = arquivo.name.split('.').pop() || 'pdf'
+    const caminho = `${user.id}/comprovante.${extensao}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('documentos-psicologos')
+      .upload(caminho, arquivo, { upsert: true })
+
+    if (uploadError) {
+      return { error: 'Erro ao enviar o documento: ' + uploadError.message }
+    }
+
+    payload.documento_url = caminho
+    // Reenviar o documento pede uma nova análise — o trigger no banco
+    // permite essa transição específica mesmo vindo do próprio psicólogo.
+    payload.status_verificacao = 'pendente'
+  }
+
   const { error } = await supabase
     .schema('clinical')
     .from('psicologos')
-    .upsert(
-      {
-        id: user.id,
-        crp,
-        bio,
-        abordagem,
-        areas_atuacao: areasAtuacao,
-        valor_sessao: valorSessao,
-        disponibilidade,
-      },
-      { onConflict: 'id' }
-    )
+    .upsert(payload, { onConflict: 'id' })
 
   if (error) {
     if (error.code === '23505') {
