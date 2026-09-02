@@ -54,6 +54,27 @@ export async function criarAgendamento(formData: FormData) {
     }
   }
 
+  // Checagem prévia de conflito de horário. Isso cobre o caso comum (dá uma
+  // mensagem clara antes de tentar inserir), mas NÃO é a proteção real contra
+  // condição de corrida — essa vem da constraint única no banco
+  // (agendamentos_sem_conflito_horario). Se dois colaboradores confirmarem ao
+  // mesmo tempo, os dois podem passar por esta checagem; só o banco garante
+  // que apenas um INSERT vai vencer.
+  const { data: conflitantes } = await supabase
+    .schema('core')
+    .from('agendamentos')
+    .select('id')
+    .eq('psicologo_id', psicologoId)
+    .eq('data_hora', dataHora)
+    .not('status', 'in', '(cancelado,remarcado)')
+    .limit(1)
+
+  if (conflitantes && conflitantes.length > 0) {
+    return {
+      error: 'Esse horário acabou de ser reservado por outro colaborador. Escolha outro horário.',
+    }
+  }
+
   const { data: vinculoRows, error: vinculoError } = await supabase
     .schema('corporate')
     .rpc('get_config_financiamento_colaborador')
@@ -86,10 +107,18 @@ export async function criarAgendamento(formData: FormData) {
     })
 
   if (error) {
+    // Rede de segurança contra condição de corrida: se a checagem prévia
+    // passou pros dois colaboradores mas o banco só aceitou um INSERT, o
+    // Postgres retorna o código 23505 (unique_violation). Traduzimos isso
+    // pra uma mensagem compreensível em vez de mostrar o erro cru do banco.
+    if (error.code === '23505') {
+      return {
+        error: 'Esse horário acabou de ser reservado por outro colaborador. Escolha outro horário.',
+      }
+    }
     return { error: error.message }
   }
 
   revalidatePath('/agendamentos')
   return { success: true }
 }
-
