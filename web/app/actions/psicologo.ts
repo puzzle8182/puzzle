@@ -3,6 +3,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
+const MODALIDADES = ['online', 'presencial', 'hibrido']
+
 export async function salvarPerfilPsicologo(formData: FormData) {
   const supabase = await createClient()
 
@@ -18,7 +20,12 @@ export async function salvarPerfilPsicologo(formData: FormData) {
   const bio = (formData.get('bio') as string)?.trim()
   const abordagem = (formData.get('abordagem') as string)?.trim()
   const areasRaw = (formData.get('areasAtuacao') as string)?.trim()
+  const formacaoRaw = (formData.get('formacao') as string)?.trim()
   const valorSessao = Number(formData.get('valorSessao'))
+  const anosExperienciaRaw = (formData.get('anosExperiencia') as string)?.trim()
+  const modalidadeAtendimento = (formData.get('modalidadeAtendimento') as string)?.trim()
+  const cidade = (formData.get('cidade') as string)?.trim()
+  const estado = (formData.get('estado') as string)?.trim().toUpperCase()
   const disponibilidadeRaw = formData.get('disponibilidade') as string
   const arquivo = formData.get('documento') as File | null
 
@@ -28,10 +35,19 @@ export async function salvarPerfilPsicologo(formData: FormData) {
   if (!valorSessao || valorSessao <= 0) {
     return { error: 'Informe um valor de sessão válido.' }
   }
+  if (modalidadeAtendimento && !MODALIDADES.includes(modalidadeAtendimento)) {
+    return { error: 'Modalidade de atendimento inválida.' }
+  }
 
   const areasAtuacao = areasRaw
     ? areasRaw.split(',').map((a) => a.trim()).filter(Boolean)
     : []
+
+  const formacao = formacaoRaw
+    ? formacaoRaw.split('\n').map((f) => f.trim()).filter(Boolean)
+    : []
+
+  const anosExperiencia = anosExperienciaRaw ? Number(anosExperienciaRaw) : null
 
   let disponibilidade: unknown = []
   try {
@@ -46,6 +62,11 @@ export async function salvarPerfilPsicologo(formData: FormData) {
     bio,
     abordagem,
     areas_atuacao: areasAtuacao,
+    formacao,
+    anos_experiencia: anosExperiencia,
+    modalidade_atendimento: modalidadeAtendimento || null,
+    cidade: cidade || null,
+    estado: estado || null,
     valor_sessao: valorSessao,
     disponibilidade,
   }
@@ -84,6 +105,6 @@ export async function salvarPerfilPsicologo(formData: FormData) {
 
   revalidatePath('/dashboard')
   revalidatePath('/perfil-psicologo')
+  revalidatePath('/buscar')
   return { success: true }
 }
-

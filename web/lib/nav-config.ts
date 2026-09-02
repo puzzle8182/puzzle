@@ -17,6 +17,7 @@ export const NAV_BY_ROLE: Record<AppRole, NavItem[]> = {
     { label: 'Início', href: '/dashboard', icon: 'home' },
     { label: 'Buscar psicólogo', href: '/buscar', icon: 'search' },
     { label: 'Meus agendamentos', href: '/agendamentos', icon: 'calendar' },
+    { label: 'Meu perfil', href: '/perfil', icon: 'settings' },
   ],
   psicologo: [
     { label: 'Agenda', href: '/dashboard', icon: 'calendar' },

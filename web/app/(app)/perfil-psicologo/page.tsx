@@ -13,35 +13,33 @@ export default async function PerfilPsicologoPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('full_name, email, foto_url, role')
     .eq('id', user.id)
     .single()
 
-  if (profile?.role !== 'psicologo') {
-    redirect('/dashboard')
-  }
+  if (!profile || profile.role !== 'psicologo') redirect('/dashboard')
 
   const { data: perfil } = await supabase
     .schema('clinical')
     .from('psicologos')
     .select(
-      'crp, bio, abordagem, areas_atuacao, valor_sessao, status_assinatura, status_verificacao, documento_url, disponibilidade'
+      'crp, bio, abordagem, areas_atuacao, formacao, anos_experiencia, modalidade_atendimento, cidade, estado, valor_sessao, status_assinatura, status_verificacao, documento_url, disponibilidade'
     )
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
 
   return (
     <div>
-      <h1 className="font-display text-3xl text-ink">Meu perfil profissional</h1>
-      <p className="text-ink-soft mt-2">
-        Essas informações aparecem para colaboradores na hora de escolher um
-        psicólogo.
+      <h1 className="font-display text-3xl text-ink mb-1">Perfil profissional</h1>
+      <p className="text-ink-soft mb-8">
+        Essas informações aparecem para colaboradores na busca por psicólogos.
       </p>
 
-      <div className="mt-8">
-        <PsicologoProfileForm perfil={perfil ?? null} />
-      </div>
+      <PsicologoProfileForm
+        perfil={perfil}
+        fotoUrl={profile.foto_url ?? null}
+        nome={profile.full_name ?? profile.email ?? 'Você'}
+      />
     </div>
   )
 }
-

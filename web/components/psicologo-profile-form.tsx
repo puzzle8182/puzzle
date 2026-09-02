@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { salvarPerfilPsicologo } from '@/app/actions/psicologo'
+import { AvatarUpload } from '@/components/avatar-upload'
 
 type DisponibilidadeItem = { dia: string; horarios: string[] }
 
@@ -11,6 +12,11 @@ type PerfilExistente = {
   bio: string | null
   abordagem: string | null
   areas_atuacao: string[] | null
+  formacao: string[] | null
+  anos_experiencia: number | null
+  modalidade_atendimento: string | null
+  cidade: string | null
+  estado: string | null
   valor_sessao: number
   status_assinatura: string
   status_verificacao: string
@@ -33,6 +39,13 @@ const HORARIOS_PADRAO = [
   '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
 ]
 
+const MODALIDADES = [
+  { value: '', label: 'Não informado' },
+  { value: 'online', label: 'Online' },
+  { value: 'presencial', label: 'Presencial' },
+  { value: 'hibrido', label: 'Híbrido (online e presencial)' },
+]
+
 const VERIFICACAO_LABEL: Record<string, string> = {
   pendente: 'Em análise',
   aprovado: 'Aprovado',
@@ -52,7 +65,15 @@ function disponibilidadeParaMapa(
   return mapa
 }
 
-export function PsicologoProfileForm({ perfil }: { perfil: PerfilExistente }) {
+export function PsicologoProfileForm({
+  perfil,
+  fotoUrl,
+  nome,
+}: {
+  perfil: PerfilExistente
+  fotoUrl: string | null
+  nome: string
+}) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -121,6 +142,13 @@ export function PsicologoProfileForm({ perfil }: { perfil: PerfilExistente }) {
         </div>
       )}
 
+      <div className="mb-6 rounded-xl border border-border-soft bg-white p-5">
+        <p className="text-sm text-ink-soft mb-3">
+          Foto de perfil — aparece para colaboradores na busca.
+        </p>
+        <AvatarUpload fotoUrl={fotoUrl} nome={nome} />
+      </div>
+
       <form action={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label htmlFor="crp" className="text-sm text-ink-soft block mb-1.5">
@@ -184,8 +212,22 @@ export function PsicologoProfileForm({ perfil }: { perfil: PerfilExistente }) {
         </div>
 
         <div>
+          <label htmlFor="formacao" className="text-sm text-ink-soft block mb-1.5">
+            Formação acadêmica
+          </label>
+          <textarea
+            id="formacao"
+            name="formacao"
+            rows={3}
+            defaultValue={perfil?.formacao?.join('\n') ?? ''}
+            placeholder={'Uma formação por linha, ex:\nGraduação em Psicologia — USP (2015)\nEspecialização em TCC — PUC-SP (2018)'}
+            className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage resize-none"
+          />
+        </div>
+
+        <div>
           <label htmlFor="areasAtuacao" className="text-sm text-ink-soft block mb-1.5">
-            Áreas de atuação
+            Especialidades / áreas de atuação
           </label>
           <input
             id="areasAtuacao"
@@ -195,6 +237,70 @@ export function PsicologoProfileForm({ perfil }: { perfil: PerfilExistente }) {
             placeholder="Separe por vírgula: ansiedade, luto, relacionamentos"
             className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
           />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="anosExperiencia" className="text-sm text-ink-soft block mb-1.5">
+              Anos de experiência
+            </label>
+            <input
+              id="anosExperiencia"
+              name="anosExperiencia"
+              type="number"
+              min="0"
+              max="70"
+              defaultValue={perfil?.anos_experiencia ?? ''}
+              className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
+            />
+          </div>
+          <div>
+            <label htmlFor="modalidadeAtendimento" className="text-sm text-ink-soft block mb-1.5">
+              Modalidade de atendimento
+            </label>
+            <select
+              id="modalidadeAtendimento"
+              name="modalidadeAtendimento"
+              defaultValue={perfil?.modalidade_atendimento ?? ''}
+              className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
+            >
+              {MODALIDADES.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-[1fr_auto] gap-4">
+          <div>
+            <label htmlFor="cidade" className="text-sm text-ink-soft block mb-1.5">
+              Cidade
+            </label>
+            <input
+              id="cidade"
+              name="cidade"
+              type="text"
+              defaultValue={perfil?.cidade ?? ''}
+              placeholder="Ex: Belo Horizonte"
+              className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
+            />
+          </div>
+          <div>
+            <label htmlFor="estado" className="text-sm text-ink-soft block mb-1.5">
+              UF
+            </label>
+            <input
+              id="estado"
+              name="estado"
+              type="text"
+              maxLength={2}
+              defaultValue={perfil?.estado ?? ''}
+              placeholder="MG"
+              className="w-20 rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink uppercase outline-none focus:ring-2 focus:ring-sage"
+            />
+          </div>
         </div>
 
         <div>
@@ -278,4 +384,3 @@ export function PsicologoProfileForm({ perfil }: { perfil: PerfilExistente }) {
     </div>
   )
 }
-

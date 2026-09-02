@@ -74,6 +74,47 @@ export function Icon({
           <path d="M19.4 13a7.9 7.9 0 0 0 0-2l2-1.5-2-3.4-2.4.6a8 8 0 0 0-1.7-1L15 3h-4l-.3 2.7a8 8 0 0 0-1.7 1l-2.4-.6-2 3.4L6.6 11a7.9 7.9 0 0 0 0 2l-2 1.5 2 3.4 2.4-.6a8 8 0 0 0 1.7 1L11 21h4l.3-2.7a8 8 0 0 0 1.7-1l2.4.6 2-3.4Z" />
         </svg>
       )
+    case 'shield':
+      return (
+        <svg {...base} {...props}>
+          <path d="M12 3.5 5 6v6c0 4.4 3 7.6 7 8.5 4-.9 7-4.1 7-8.5V6l-7-2.5Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      )
+    case 'lock':
+      return (
+        <svg {...base} {...props}>
+          <rect x="5" y="11" width="14" height="9" rx="1.5" />
+          <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+        </svg>
+      )
+    case 'brain':
+      return (
+        <svg {...base} {...props}>
+          <path d="M9.5 4a3 3 0 0 0-3 3v.3A3 3 0 0 0 5 10v1a3 3 0 0 0 1 2.2V15a3 3 0 0 0 3 3" />
+          <path d="M14.5 4a3 3 0 0 1 3 3v.3A3 3 0 0 1 19 10v1a3 3 0 0 1-1 2.2V15a3 3 0 0 1-3 3" />
+          <path d="M9.5 4v14M14.5 4v14" />
+        </svg>
+      )
+    case 'check':
+      return (
+        <svg {...base} {...props}>
+          <path d="m5 12.5 4.5 4.5L19 7" />
+        </svg>
+      )
+    case 'arrow-right':
+      return (
+        <svg {...base} {...props}>
+          <path d="M4 12h16M13 5l7 7-7 7" />
+        </svg>
+      )
+    case 'building':
+      return (
+        <svg {...base} {...props}>
+          <rect x="5" y="3.5" width="14" height="17" rx="1" />
+          <path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1" />
+        </svg>
+      )
     default:
       return null
   }

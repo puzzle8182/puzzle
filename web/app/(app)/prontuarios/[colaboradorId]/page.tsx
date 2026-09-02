@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { NotaSessaoForm } from '@/components/nota-sessao-form'
+import { ObjetivosTerapeuticos } from '@/components/objetivos-terapeuticos'
 
 export default async function ProntuarioPacientePage({
   params,
@@ -28,7 +29,7 @@ export default async function ProntuarioPacientePage({
 
   const { data: paciente } = await supabase
     .from('profiles')
-    .select('id, full_name, email')
+    .select('id, full_name, email, foto_url')
     .eq('id', colaboradorId)
     .single()
 
@@ -56,6 +57,16 @@ export default async function ProntuarioPacientePage({
     (notas ?? []).map((n) => [n.agendamento_id, n])
   )
 
+  const { data: objetivos } = await supabase
+    .schema('clinical')
+    .from('objetivos_terapeuticos')
+    .select('id, descricao, status, criado_em')
+    .eq('psicologo_id', user.id)
+    .eq('colaborador_profile_id', colaboradorId)
+    .order('criado_em', { ascending: true })
+
+  const sessoesRealizadas = agendamentos.filter((a) => a.status === 'realizado').length
+
   // Log de auditoria: registra que este psicólogo acessou o prontuário
   // deste paciente. Não bloqueia a página se falhar por algum motivo.
   await supabase.schema('core').rpc('registrar_acesso_clinico', {
@@ -65,8 +76,39 @@ export default async function ProntuarioPacientePage({
 
   return (
     <div className="max-w-2xl">
-      <h1 className="font-display text-3xl text-ink">{paciente.full_name ?? 'Paciente'}</h1>
-      <p className="text-ink-soft mt-1">{paciente.email}</p>
+      <div className="flex items-center gap-4">
+        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full border border-border-soft bg-sage/20">
+          {paciente.foto_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={paciente.foto_url} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center font-display text-xl text-pine">
+              {(paciente.full_name ?? '?').charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+        <div>
+          <h1 className="font-display text-2xl text-ink">{paciente.full_name ?? 'Paciente'}</h1>
+          <p className="text-ink-soft text-sm">{paciente.email}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <span className="rounded-full bg-paper border border-border-soft px-3 py-1 text-xs text-ink-soft">
+          {agendamentos.length} sessões agendadas
+        </span>
+        <span className="rounded-full bg-paper border border-border-soft px-3 py-1 text-xs text-ink-soft">
+          {sessoesRealizadas} realizadas
+        </span>
+      </div>
+
+      <div className="mt-8 rounded-xl border border-border-soft bg-white p-5">
+        <h2 className="font-medium text-ink mb-4">Objetivos terapêuticos</h2>
+        <ObjetivosTerapeuticos
+          colaboradorProfileId={colaboradorId}
+          objetivos={objetivos ?? []}
+        />
+      </div>
 
       <div className="mt-8 flex flex-col gap-6">
         {agendamentos.map((a) => {
@@ -96,4 +138,3 @@ export default async function ProntuarioPacientePage({
     </div>
   )
 }
-
