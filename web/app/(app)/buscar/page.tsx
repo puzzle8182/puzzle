@@ -31,12 +31,12 @@ export default async function BuscarPage() {
         </p>
       )}
 
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {psicologos?.map((p) => (
           <Link
             key={p.id}
             href={`/buscar/${p.id}`}
-            className="block rounded-xl border border-border-soft bg-white p-5 hover:border-sage transition-colors"
+            className="block rounded-2xl border border-border-soft bg-white p-6 transition hover:-translate-y-0.5 hover:border-sage hover:shadow-lg hover:shadow-pine/5"
           >
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border border-border-soft bg-sage/20">

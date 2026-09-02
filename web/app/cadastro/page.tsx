@@ -77,7 +77,7 @@ export default function CadastroPage() {
   if (confirmEmailSent) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-paper px-4">
-        <div className="w-full max-w-sm text-center">
+        <div className="w-full max-w-sm rounded-[1.75rem] border border-border-soft bg-white p-10 text-center shadow-[0_24px_64px_-24px_rgba(23,36,42,0.18)]">
           <BrandMark size={40} tone="dark" />
           <h1 className="font-display text-2xl text-ink mt-4">Confirme seu e-mail</h1>
           <p className="text-ink-soft text-sm mt-2">
@@ -97,7 +97,7 @@ export default function CadastroPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-paper px-4 py-10">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm rounded-[1.75rem] border border-border-soft bg-white p-8 shadow-[0_24px_64px_-24px_rgba(23,36,42,0.18)] sm:p-10">
         <div className="flex flex-col items-center mb-8">
           <BrandMark size={40} tone="dark" />
           <h1 className="font-display text-2xl text-ink mt-4">Criar conta</h1>
@@ -110,10 +110,10 @@ export default function CadastroPage() {
               key={opt.value}
               type="button"
               onClick={() => setRole(opt.value)}
-              className={`text-left rounded-lg border px-4 py-3 transition-colors ${
+              className={`text-left rounded-xl border px-4 py-3 transition-colors ${
                 role === opt.value
                   ? 'border-pine bg-sage/20'
-                  : 'border-border-soft bg-white hover:border-sage'
+                  : 'border-border-soft bg-paper hover:border-sage'
               }`}
             >
               <p className="text-sm font-medium text-ink">{opt.label}</p>
@@ -133,7 +133,7 @@ export default function CadastroPage() {
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
+              className="w-full rounded-lg border border-border-soft bg-paper px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
             />
           </div>
 
@@ -147,7 +147,7 @@ export default function CadastroPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
+              className="w-full rounded-lg border border-border-soft bg-paper px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
             />
           </div>
 
@@ -162,7 +162,7 @@ export default function CadastroPage() {
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
+              className="w-full rounded-lg border border-border-soft bg-paper px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
               placeholder="mínimo 6 caracteres"
             />
           </div>

@@ -1,4 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
+import { Icon } from '@/components/icon'
+
+const STATUS_STYLE: Record<string, string> = {
+  realizado: 'bg-sage/20 text-pine',
+  agendado: 'bg-amber/15 text-amber',
+  cancelado: 'bg-paper text-ink-soft border border-border-soft',
+}
 
 export default async function AgendamentosPage() {
   const supabase = await createClient()
@@ -37,24 +44,33 @@ export default async function AgendamentosPage() {
         <p className="text-ink-soft mt-4">Você ainda não tem sessões agendadas.</p>
       )}
 
-      <div className="mt-6 flex flex-col gap-3">
+      <div className="mt-8 flex flex-col gap-4">
         {agendamentos?.map((a) => (
           <div
             key={a.id}
-            className="rounded-xl border border-border-soft bg-white p-4 flex justify-between items-center"
+            className="flex items-center justify-between gap-4 rounded-2xl border border-border-soft bg-white p-6"
           >
-            <div>
-              <p className="text-sm text-ink-soft">
-                {rotuloPorId[a.psicologo_id] ?? 'Psicoterapia'}
-              </p>
-              <p className="font-display text-lg text-ink">
-                {new Date(a.data_hora).toLocaleString('pt-BR', {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                })}
-              </p>
+            <div className="flex items-center gap-4">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-pine/10 text-pine">
+                <Icon name="calendar" width={18} height={18} />
+              </span>
+              <div>
+                <p className="text-sm text-ink-soft">
+                  {rotuloPorId[a.psicologo_id] ?? 'Psicoterapia'}
+                </p>
+                <p className="font-display text-lg text-ink">
+                  {new Date(a.data_hora).toLocaleString('pt-BR', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  })}
+                </p>
+              </div>
             </div>
-            <span className="text-xs uppercase tracking-wide text-ink-soft">
+            <span
+              className={`rounded-full px-2.5 py-1 text-xs font-medium uppercase tracking-wide ${
+                STATUS_STYLE[a.status] ?? 'bg-paper text-ink-soft border border-border-soft'
+              }`}
+            >
               {a.status}
             </span>
           </div>
@@ -63,4 +79,3 @@ export default async function AgendamentosPage() {
     </div>
   )
 }
-

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { Icon } from '@/components/icon'
 
 export default async function PacientesPage() {
   const supabase = await createClient()
@@ -88,14 +89,14 @@ export default async function PacientesPage() {
         </p>
       )}
 
-      <div className="mt-8 flex flex-col gap-2">
+      <div className="mt-8 flex flex-col gap-3">
         {pacientes.map((p) => {
           const resumo = resumoPorPaciente.get(p.id)
           return (
             <Link
               key={p.id}
               href={`/prontuarios/${p.id}`}
-              className="flex items-center gap-3.5 rounded-xl border border-border-soft bg-white p-4 hover:border-sage transition-colors"
+              className="flex items-center gap-3.5 rounded-2xl border border-border-soft bg-white p-5 transition hover:-translate-y-0.5 hover:border-sage hover:shadow-lg hover:shadow-pine/5"
             >
               <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-border-soft bg-sage/20">
                 {p.foto_url ? (
@@ -115,11 +116,13 @@ export default async function PacientesPage() {
 
               {resumo && (
                 <div className="hidden shrink-0 items-center gap-1.5 sm:flex">
-                  <span className="rounded-full bg-paper border border-border-soft px-2.5 py-1 text-xs text-ink-soft">
+                  <span className="flex items-center gap-1.5 rounded-full bg-paper border border-border-soft px-2.5 py-1 text-xs text-ink-soft">
+                    <Icon name="calendar" width={12} height={12} />
                     {resumo.sessoesRealizadas}/{resumo.totalSessoes} sessões
                   </span>
                   {resumo.totalObjetivos > 0 && (
-                    <span className="rounded-full bg-sage/20 px-2.5 py-1 text-xs text-pine">
+                    <span className="flex items-center gap-1.5 rounded-full bg-sage/20 px-2.5 py-1 text-xs text-pine">
+                      <Icon name="check" width={12} height={12} />
                       {resumo.objetivosConcluidos}/{resumo.totalObjetivos} objetivos
                     </span>
                   )}

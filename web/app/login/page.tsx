@@ -35,7 +35,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-paper px-4">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm rounded-[1.75rem] border border-border-soft bg-white p-8 shadow-[0_24px_64px_-24px_rgba(23,36,42,0.18)] sm:p-10">
         <div className="flex flex-col items-center mb-8">
           <BrandMark size={40} tone="dark" />
           <h1 className="font-display text-2xl text-ink mt-4">Entrar</h1>
@@ -53,7 +53,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
+              className="w-full rounded-lg border border-border-soft bg-paper px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
               placeholder="voce@email.com"
             />
           </div>
@@ -68,7 +68,7 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
+              className="w-full rounded-lg border border-border-soft bg-paper px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage"
               placeholder="••••••••"
             />
           </div>

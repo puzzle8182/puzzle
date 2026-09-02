@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { CriarEmpresaForm } from '@/components/criar-empresa-form'
 import { AdicionarColaboradorForm } from '@/components/adicionar-colaborador-form'
+import { Icon } from '@/components/icon'
 
 const MODALIDADE_LABEL: Record<string, string> = {
   integral: 'Custeio integral',
@@ -38,7 +39,13 @@ export default async function ColaboradoresPage() {
     return (
       <div>
         <h1 className="font-display text-3xl text-ink">Cadastre sua empresa</h1>
-        <div className="mt-8">
+        <div className="mt-8 rounded-2xl border border-border-soft bg-white p-7">
+          <div className="mb-5 flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-pine/10 text-pine">
+              <Icon name="building" width={16} height={16} />
+            </span>
+            <p className="text-sm font-medium text-ink">Dados da empresa</p>
+          </div>
           <CriarEmpresaForm />
         </div>
       </div>
@@ -80,13 +87,18 @@ export default async function ColaboradoresPage() {
           ` · empresa cobre ${empresa.percentual_coparticipacao_empresa}%`}
       </p>
 
-      <div className="mt-8">
-        <h2 className="font-display text-lg text-ink mb-3">Adicionar colaborador</h2>
+      <div className="mt-8 rounded-2xl border border-border-soft bg-white p-7">
+        <div className="mb-5 flex items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-pine/10 text-pine">
+            <Icon name="users" width={16} height={16} />
+          </span>
+          <h2 className="font-medium text-ink">Adicionar colaborador</h2>
+        </div>
         <AdicionarColaboradorForm empresaId={vinculo.empresa_id} />
       </div>
 
-      <div className="mt-10">
-        <h2 className="font-display text-lg text-ink mb-3">
+      <div className="mt-8">
+        <h2 className="font-display text-lg text-ink mb-4">
           Colaboradores ({colaboradores?.length ?? 0})
         </h2>
 
@@ -94,13 +106,13 @@ export default async function ColaboradoresPage() {
           <p className="text-ink-soft text-sm">Nenhum colaborador adicionado ainda.</p>
         )}
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           {colaboradores?.map((c) => {
             const perfil = perfilPorId[c.profile_id]
             return (
               <div
                 key={c.id}
-                className="rounded-lg border border-border-soft bg-white px-4 py-3 flex justify-between items-center"
+                className="flex items-center justify-between gap-4 rounded-2xl border border-border-soft bg-white px-6 py-4"
               >
                 <div>
                   <p className="text-sm font-medium text-ink">
@@ -109,8 +121,10 @@ export default async function ColaboradoresPage() {
                   <p className="text-xs text-ink-soft">{perfil?.email}</p>
                 </div>
                 <span
-                  className={`text-xs uppercase tracking-wide ${
-                    c.ativo ? 'text-pine' : 'text-ink-soft'
+                  className={`rounded-full px-2.5 py-1 text-xs font-medium uppercase tracking-wide ${
+                    c.ativo
+                      ? 'bg-sage/20 text-pine'
+                      : 'bg-paper text-ink-soft border border-border-soft'
                   }`}
                 >
                   {c.ativo ? 'Ativo' : 'Inativo'}
@@ -123,4 +137,3 @@ export default async function ColaboradoresPage() {
     </div>
   )
 }
-

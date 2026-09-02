@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { AvatarUpload } from '@/components/avatar-upload'
+import { Icon } from '@/components/icon'
 
 export default async function PerfilPage() {
   const supabase = await createClient()
@@ -26,15 +27,22 @@ export default async function PerfilPage() {
         Sua foto aparece para o psicólogo que te acompanha, dentro do prontuário.
       </p>
 
-      <div className="mt-8 rounded-xl border border-border-soft bg-white p-6">
+      <div className="mt-8 rounded-2xl border border-border-soft bg-white p-7">
+        <div className="mb-5 flex items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-pine/10 text-pine">
+            <Icon name="settings" width={16} height={16} />
+          </span>
+          <p className="text-sm font-medium text-ink">Dados pessoais</p>
+        </div>
+
         <AvatarUpload fotoUrl={profile?.foto_url ?? null} nome={nome} />
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div>
+          <div className="rounded-xl bg-paper p-4">
             <p className="text-sm text-ink-soft mb-1">Nome</p>
             <p className="font-medium text-ink">{profile?.full_name ?? '—'}</p>
           </div>
-          <div>
+          <div className="rounded-xl bg-paper p-4">
             <p className="text-sm text-ink-soft mb-1">E-mail</p>
             <p className="font-medium text-ink">{profile?.email ?? '—'}</p>
           </div>

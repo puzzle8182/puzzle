@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { salvarPerfilPsicologo } from '@/app/actions/psicologo'
 import { AvatarUpload } from '@/components/avatar-upload'
+import { Icon } from '@/components/icon'
 
 type DisponibilidadeItem = { dia: string; horarios: string[] }
 
@@ -118,15 +119,20 @@ export function PsicologoProfileForm({
   return (
     <div className="max-w-2xl">
       {perfil && (
-        <div className="mb-6 flex flex-col gap-2">
-          <div className="rounded-lg bg-sage/15 border border-sage/40 px-4 py-3 text-sm text-ink">
-            Status da assinatura:{' '}
-            <strong className="capitalize">{perfil.status_assinatura}</strong>.{' '}
-            {perfil.status_assinatura !== 'ativa' &&
-              'Seu perfil só aparece na busca quando a assinatura estiver ativa.'}
+        <div className="mb-6 flex flex-col gap-3">
+          <div className="flex items-start gap-3.5 rounded-2xl border border-sage/40 bg-sage/15 px-5 py-4">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sage/25 text-pine">
+              <Icon name="card" width={16} height={16} />
+            </span>
+            <p className="text-sm text-ink leading-6">
+              Status da assinatura:{' '}
+              <strong className="capitalize">{perfil.status_assinatura}</strong>.{' '}
+              {perfil.status_assinatura !== 'ativa' &&
+                'Seu perfil só aparece na busca quando a assinatura estiver ativa.'}
+            </p>
           </div>
           <div
-            className={`rounded-lg border px-4 py-3 text-sm text-ink ${
+            className={`flex items-start gap-3.5 rounded-2xl border px-5 py-4 ${
               perfil.status_verificacao === 'aprovado'
                 ? 'bg-sage/15 border-sage/40'
                 : perfil.status_verificacao === 'rejeitado'
@@ -134,22 +140,35 @@ export function PsicologoProfileForm({
                   : 'bg-amber/10 border-amber/30'
             }`}
           >
-            Documentação:{' '}
-            <strong>{VERIFICACAO_LABEL[perfil.status_verificacao] ?? perfil.status_verificacao}</strong>.{' '}
-            {perfil.status_verificacao !== 'aprovado' &&
-              'Um responsável técnico precisa aprovar seu CRP antes do seu perfil aparecer na busca.'}
+            <span
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                perfil.status_verificacao === 'aprovado'
+                  ? 'bg-sage/25 text-pine'
+                  : perfil.status_verificacao === 'rejeitado'
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-amber/20 text-amber'
+              }`}
+            >
+              <Icon name="shield" width={16} height={16} />
+            </span>
+            <p className="text-sm text-ink leading-6">
+              Documentação:{' '}
+              <strong>{VERIFICACAO_LABEL[perfil.status_verificacao] ?? perfil.status_verificacao}</strong>.{' '}
+              {perfil.status_verificacao !== 'aprovado' &&
+                'Um responsável técnico precisa aprovar seu CRP antes do seu perfil aparecer na busca.'}
+            </p>
           </div>
         </div>
       )}
 
-      <div className="mb-6 rounded-xl border border-border-soft bg-white p-5">
+      <div className="mb-6 rounded-2xl border border-border-soft bg-white p-6">
         <p className="text-sm text-ink-soft mb-3">
           Foto de perfil — aparece para colaboradores na busca.
         </p>
         <AvatarUpload fotoUrl={fotoUrl} nome={nome} />
       </div>
 
-      <form action={handleSubmit} className="flex flex-col gap-4">
+      <form action={handleSubmit} className="flex flex-col gap-4 rounded-2xl border border-border-soft bg-white p-6 sm:p-7">
         <div>
           <label htmlFor="crp" className="text-sm text-ink-soft block mb-1.5">
             CRP
@@ -328,7 +347,7 @@ export function PsicologoProfileForm({
             cada dia da semana. Colaboradores só conseguem agendar dentro
             desses horários.
           </p>
-          <div className="overflow-x-auto rounded-lg border border-border-soft">
+          <div className="overflow-x-auto rounded-xl border border-border-soft">
             <table className="w-full text-xs">
               <thead>
                 <tr className="bg-paper">

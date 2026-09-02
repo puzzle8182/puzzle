@@ -3,26 +3,31 @@ import { BrandMark } from '@/components/brand-mark'
 import { Icon } from '@/components/icon'
 import { HeroNetwork } from '@/components/hero-network'
 
+const TAG = 'mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-sage'
+
 const PROBLEMAS = [
   {
+    icon: 'card',
     quem: 'Para quem quer começar',
     titulo: 'O custo ainda decide quem começa a terapia',
     texto:
       'Mesmo quando existe vontade de iniciar o acompanhamento, o valor das sessões pode ser o que trava a decisão — principalmente porque psicoterapia raramente se resolve em um único encontro.',
   },
   {
+    icon: 'building',
     quem: 'Para quem quer oferecer o benefício',
     titulo: 'Montar uma rede própria dá trabalho demais',
     texto:
       'Selecionar profissionais, administrar pagamentos e gerir o benefício de saúde mental exige uma estrutura que a maioria das empresas não tem tempo de construir sozinha.',
   },
   {
+    icon: 'file',
     quem: 'Para quem atende',
     titulo: 'Encontrar pacientes e organizar o histórico consome a rotina',
     texto:
       'Divulgação e indicação ainda são o principal caminho até novos pacientes. E, com o tempo, cada acompanhamento acumula tantos registros que recuperar o que já foi anotado vira trabalho manual.',
   },
-]
+] as const
 
 const PASSOS = [
   {
@@ -50,6 +55,7 @@ const PASSOS = [
 const PARA_QUEM = [
   {
     icon: 'building',
+    tint: 'bg-amber/10',
     titulo: 'Para empresas',
     linha: 'Um benefício de saúde mental sem montar a operação sozinha.',
     texto:
@@ -58,6 +64,7 @@ const PARA_QUEM = [
   },
   {
     icon: 'users',
+    tint: 'bg-sage/20',
     titulo: 'Para colaboradores',
     linha: 'Você escolhe o profissional. A empresa participa do custo.',
     texto:
@@ -66,12 +73,26 @@ const PARA_QUEM = [
   },
   {
     icon: 'brain',
+    tint: 'bg-pine/10',
     titulo: 'Para psicólogos',
     linha: 'Presença profissional, demanda corporativa e ferramentas para a prática.',
     texto:
       'A mensalidade dá acesso à rede e à infraestrutura — não é compra de pacientes nem garante volume mínimo de atendimentos. Quem escolhe o profissional continua sendo o colaborador.',
     bullets: ['Perfil, agenda e valores sob seu controle', 'Recebimento direto pelo atendimento', 'Ferramentas de organização clínica com IA'],
   },
+] as const
+
+const INTELIGENCIA = [
+  'Registros organizados cronologicamente por paciente',
+  'Recuperação rápida de temas já documentados',
+  'Linha do tempo do acompanhamento',
+  'Painéis que separam registro de interpretação clínica',
+]
+
+const PAPEIS = [
+  { icon: 'building', titulo: 'Sou de uma empresa', hint: 'Contratar e gerenciar o benefício' },
+  { icon: 'users', titulo: 'Sou colaborador', hint: 'Usar o benefício da minha empresa' },
+  { icon: 'brain', titulo: 'Sou psicólogo(a)', hint: 'Atender pela plataforma' },
 ] as const
 
 export default function LandingPage() {
@@ -97,7 +118,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/cadastro"
-              className="rounded-lg bg-pine px-4 py-2 text-sm font-medium text-paper hover:bg-pine-dark transition-colors"
+              className="rounded-full bg-pine px-4 py-2 text-sm font-medium text-paper hover:bg-pine-dark transition-colors"
             >
               Cadastre-se
             </Link>
@@ -110,7 +131,10 @@ export default function LandingPage() {
         <section className="mx-auto max-w-6xl px-6 pt-16 pb-20 md:pt-24 md:pb-28">
           <div className="grid items-center gap-14 md:grid-cols-[1.1fr_0.9fr]">
             <div>
-              <p className="text-sm font-medium text-ink-soft mb-5">Benefício corporativo de psicoterapia</p>
+              <p className="mb-5 flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-sage">
+                <span className="h-px w-8 bg-sage" />
+                Benefício corporativo de psicoterapia
+              </p>
 
               <h1 className="font-display text-[2.35rem] leading-[1.18] text-ink sm:text-5xl sm:leading-[1.15]">
                 A <span className="text-pine">empresa</span> financia o acesso.
@@ -128,7 +152,7 @@ export default function LandingPage() {
               <div className="mt-9 flex flex-wrap items-center gap-4">
                 <Link
                   href="/cadastro"
-                  className="rounded-lg bg-pine px-6 py-3 text-sm font-medium text-paper hover:bg-pine-dark transition-colors"
+                  className="rounded-full bg-pine px-6 py-3 text-sm font-medium text-paper hover:bg-pine-dark transition-colors"
                 >
                   Criar conta gratuita
                 </Link>
@@ -142,24 +166,36 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <HeroNetwork />
+            <div className="relative">
+              <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-sage/25 to-pine/10" />
+              <div className="rounded-[2rem] border border-border-soft bg-white p-8 shadow-[0_24px_64px_-24px_rgba(23,36,42,0.22)] sm:p-10">
+                <HeroNetwork />
+              </div>
+            </div>
           </div>
         </section>
 
         {/* problemas */}
-        <section className="border-t border-border-soft">
+        <section id="problema" className="border-t border-border-soft bg-white">
           <div className="mx-auto max-w-6xl px-6 py-20">
             <div className="max-w-lg">
+              <p className={TAG}>O que hoje trava o cuidado</p>
               <h2 className="font-display text-3xl text-ink">Três problemas que hoje aparecem separados</h2>
               <p className="mt-3 text-ink-soft leading-7">
                 A plataforma nasce da conexão entre eles, sem pedir que nenhuma das partes abra mão do que é seu.
               </p>
             </div>
 
-            <div className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
               {PROBLEMAS.map((p) => (
-                <div key={p.titulo} className="border-t border-border-soft pt-5">
-                  <p className="text-sm text-ink-soft mb-2.5">{p.quem}</p>
+                <div
+                  key={p.titulo}
+                  className="rounded-2xl border border-border-soft bg-paper p-7 transition hover:-translate-y-1 hover:shadow-lg hover:shadow-pine/5"
+                >
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-pine/10 text-pine">
+                    <Icon name={p.icon} width={22} height={22} />
+                  </div>
+                  <p className="mb-2.5 text-sm text-ink-soft">{p.quem}</p>
                   <h3 className="font-display text-xl text-ink leading-snug">{p.titulo}</h3>
                   <p className="mt-3 text-[15px] leading-7 text-ink-soft">{p.texto}</p>
                 </div>
@@ -169,33 +205,37 @@ export default function LandingPage() {
         </section>
 
         {/* como funciona */}
-        <section id="como-funciona" className="border-t border-border-soft bg-white">
+        <section id="como-funciona" className="border-t border-border-soft">
           <div className="mx-auto max-w-6xl px-6 py-20">
             <div className="max-w-lg">
+              <p className={TAG}>Passo a passo</p>
               <h2 className="font-display text-3xl text-ink">Como funciona, do contrato ao atendimento</h2>
               <p className="mt-3 text-ink-soft leading-7">
                 Cinco passos conectam a decisão da empresa até o registro organizado pela tecnologia.
               </p>
             </div>
 
-            <ol className="mt-12 flex flex-col divide-y divide-border-soft">
-              {PASSOS.map((passo, i) => (
-                <li key={passo.titulo} className="flex flex-col gap-4 py-6 sm:flex-row sm:items-baseline sm:gap-8">
-                  <span className="font-display text-2xl text-sage shrink-0 sm:w-10">{i + 1}</span>
-                  <div>
-                    <h3 className="text-ink font-medium">{passo.titulo}</h3>
-                    <p className="mt-1.5 max-w-2xl text-[15px] leading-7 text-ink-soft">{passo.texto}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <div className="mt-12 rounded-2xl border border-border-soft bg-white px-6 sm:px-8">
+              <ol className="flex flex-col divide-y divide-border-soft">
+                {PASSOS.map((passo, i) => (
+                  <li key={passo.titulo} className="flex flex-col gap-4 py-6 sm:flex-row sm:items-baseline sm:gap-8">
+                    <span className="font-display text-2xl text-sage shrink-0 sm:w-10">{i + 1}</span>
+                    <div>
+                      <h3 className="text-ink font-medium">{passo.titulo}</h3>
+                      <p className="mt-1.5 max-w-2xl text-[15px] leading-7 text-ink-soft">{passo.texto}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
         </section>
 
         {/* dois fluxos financeiros */}
-        <section className="border-t border-border-soft">
+        <section className="border-t border-border-soft bg-white">
           <div className="mx-auto max-w-6xl px-6 py-20">
             <div className="max-w-lg">
+              <p className={TAG}>Modelo financeiro</p>
               <h2 className="font-display text-3xl text-ink">Dois fluxos financeiros que nunca se misturam</h2>
               <p className="mt-3 text-ink-soft leading-7">
                 O psicólogo não financia a sessão do paciente. Ele recebe pelo atendimento e paga, à
@@ -204,26 +244,26 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-12 grid gap-6 md:grid-cols-2">
-              <div className="rounded-xl border border-border-soft bg-white p-7">
-                <p className="text-sm font-medium text-pine mb-4">Fluxo da sessão</p>
-                <div className="flex flex-wrap items-center gap-2.5 text-ink font-medium">
-                  <span className="rounded-full border border-border-soft px-3.5 py-1.5 text-sm">Empresa</span>
-                  <span className="text-ink-soft text-sm font-normal">+ colaborador, se houver coparticipação</span>
+              <div className="rounded-2xl bg-pine p-8 text-paper">
+                <p className="mb-4 text-sm font-semibold uppercase tracking-wide text-paper/70">Fluxo da sessão</p>
+                <div className="flex flex-wrap items-center gap-2.5 font-medium">
+                  <span className="rounded-full border border-paper/30 px-3.5 py-1.5 text-sm">Empresa</span>
+                  <span className="text-sm font-normal text-paper/70">+ colaborador, se houver coparticipação</span>
                 </div>
                 <Icon name="arrow-right" className="my-3 text-sage rotate-90" width={18} height={18} />
-                <span className="rounded-full bg-pine px-3.5 py-1.5 text-sm font-medium text-paper">Psicólogo</span>
-                <p className="mt-5 text-sm leading-6 text-ink-soft">
+                <span className="rounded-full bg-white px-3.5 py-1.5 text-sm font-medium text-pine">Psicólogo</span>
+                <p className="mt-5 text-sm leading-6 text-paper/75">
                   Financia cada atendimento, integralmente ou em coparticipação, conforme o contrato da empresa.
                 </p>
               </div>
 
-              <div className="rounded-xl border border-border-soft bg-white p-7">
-                <p className="text-sm font-medium text-amber mb-4">Fluxo da assinatura</p>
+              <div className="rounded-2xl border border-border-soft bg-paper p-8">
+                <p className="mb-4 text-sm font-semibold uppercase tracking-wide text-amber">Fluxo da assinatura</p>
                 <span className="rounded-full bg-pine px-3.5 py-1.5 text-sm font-medium text-paper">Psicólogo</span>
                 <Icon name="arrow-right" className="my-3 text-sage rotate-90" width={18} height={18} />
                 <div className="flex flex-wrap items-center gap-2.5">
-                  <span className="rounded-full border border-border-soft px-3.5 py-1.5 text-sm font-medium text-ink">R$ 150/mês</span>
-                  <span className="rounded-full border border-border-soft px-3.5 py-1.5 text-sm text-ink">Plataforma</span>
+                  <span className="rounded-full border border-border-soft bg-white px-3.5 py-1.5 text-sm font-medium text-ink">R$ 150/mês</span>
+                  <span className="rounded-full border border-border-soft bg-white px-3.5 py-1.5 text-sm text-ink">Plataforma</span>
                 </div>
                 <p className="mt-5 text-sm leading-6 text-ink-soft">
                   Dá acesso à rede, ao perfil profissional e às ferramentas da plataforma — não é subsídio à sessão de ninguém.
@@ -234,24 +274,27 @@ export default function LandingPage() {
         </section>
 
         {/* para quem */}
-        <section id="para-quem" className="border-t border-border-soft bg-white">
+        <section id="para-quem" className="border-t border-border-soft">
           <div className="mx-auto max-w-6xl px-6 py-20">
+            <p className={TAG}>Os três lados</p>
             <h2 className="font-display text-3xl text-ink max-w-lg">Feita para os três lados da mesma relação</h2>
 
-            <div className="mt-14 flex flex-col gap-16">
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
               {PARA_QUEM.map((item) => (
-                <div key={item.titulo} className="grid items-start gap-8 md:grid-cols-[auto_1fr]">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-sage/20 text-pine">
-                    <Icon name={item.icon} width={26} height={26} />
+                <div key={item.titulo} className="overflow-hidden rounded-2xl border border-border-soft bg-white">
+                  <div className={`p-7 pb-6 ${item.tint}`}>
+                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/70 text-pine">
+                      <Icon name={item.icon} width={22} height={22} />
+                    </div>
+                    <h3 className="font-display text-xl text-ink">{item.titulo}</h3>
+                    <p className="mt-1.5 text-sm font-medium text-ink">{item.linha}</p>
                   </div>
-                  <div>
-                    <h3 className="font-display text-2xl text-ink">{item.titulo}</h3>
-                    <p className="mt-1.5 text-ink font-medium">{item.linha}</p>
-                    <p className="mt-3 max-w-2xl text-[15px] leading-7 text-ink-soft">{item.texto}</p>
-                    <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+                  <div className="p-7 pt-5">
+                    <p className="text-[15px] leading-7 text-ink-soft">{item.texto}</p>
+                    <ul className="mt-4 flex flex-col gap-2.5">
                       {item.bullets.map((b) => (
-                        <li key={b} className="flex items-center gap-2 text-sm text-ink-soft">
-                          <Icon name="check" width={15} height={15} className="text-pine shrink-0" />
+                        <li key={b} className="flex items-start gap-2 text-sm text-ink-soft">
+                          <Icon name="check" width={15} height={15} className="text-pine shrink-0 mt-0.5" />
                           {b}
                         </li>
                       ))}
@@ -264,11 +307,11 @@ export default function LandingPage() {
         </section>
 
         {/* inteligência clínica */}
-        <section className="border-t border-border-soft">
+        <section className="border-t border-border-soft bg-white">
           <div className="mx-auto max-w-6xl px-6 py-20">
             <div className="grid gap-12 md:grid-cols-2 md:items-center">
               <div>
-                <p className="text-sm font-medium text-ink-soft mb-4">Inteligência clínica</p>
+                <p className={TAG}>Inteligência clínica</p>
                 <p className="font-display text-3xl italic leading-snug text-ink sm:text-4xl">
                   A IA organiza. Quem interpreta é o psicólogo.
                 </p>
@@ -278,47 +321,51 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <ul className="flex flex-col divide-y divide-border-soft">
-                {[
-                  'Registros organizados cronologicamente por paciente',
-                  'Recuperação rápida de temas já documentados',
-                  'Linha do tempo do acompanhamento',
-                  'Painéis que separam registro de interpretação clínica',
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-3 py-3.5 text-ink">
-                    <Icon name="brain" width={18} height={18} className="text-sage mt-0.5 shrink-0" />
-                    <span className="text-[15px]">{f}</span>
-                  </li>
+              <div className="flex flex-col gap-3">
+                {INTELIGENCIA.map((f) => (
+                  <div
+                    key={f}
+                    className="flex items-start gap-4 rounded-xl border border-border-soft bg-paper p-5 transition hover:border-pine/40"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sage/25 text-pine">
+                      <Icon name="brain" width={18} height={18} />
+                    </div>
+                    <span className="mt-1.5 text-[15px] leading-6 text-ink">{f}</span>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
         </section>
 
         {/* privacidade */}
-        <section id="privacidade" className="bg-pine-dark text-paper">
+        <section id="privacidade" className="border-t border-border-soft bg-pine-dark text-paper">
           <div className="mx-auto max-w-6xl px-6 py-20">
-            <div className="grid gap-10 md:grid-cols-[1fr_auto] md:items-center">
-              <p className="font-display text-3xl leading-snug sm:text-4xl">
-                A empresa financia o cuidado.
-                <br />
-                Não acessa a terapia.
-              </p>
-              <div className="flex flex-col gap-4 max-w-sm">
-                <div className="flex items-start gap-3">
-                  <Icon name="lock" width={18} height={18} className="mt-0.5 shrink-0 text-sage" />
-                  <p className="text-sm leading-6 text-paper/80">
-                    Dados clínicos e dados corporativos vivem em ambientes tecnicamente separados —
-                    não é apenas uma regra de negócio, é a arquitetura do banco de dados.
-                  </p>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-sage">Privacidade & segurança</p>
+            <p className="max-w-xl font-display text-3xl leading-snug sm:text-4xl">
+              A empresa financia o cuidado.
+              <br />
+              Não acessa a terapia.
+            </p>
+
+            <div className="mt-10 grid gap-5 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-6 transition hover:bg-white/[0.1]">
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-white/10 text-sage">
+                  <Icon name="lock" width={18} height={18} />
                 </div>
-                <div className="flex items-start gap-3">
-                  <Icon name="shield" width={18} height={18} className="mt-0.5 shrink-0 text-sage" />
-                  <p className="text-sm leading-6 text-paper/80">
-                    Indicadores para a empresa são sempre agregados e anônimos, com proteção contra
-                    reidentificação em grupos pequenos.
-                  </p>
+                <p className="text-sm leading-6 text-paper/80">
+                  Dados clínicos e dados corporativos vivem em ambientes tecnicamente separados —
+                  não é apenas uma regra de negócio, é a arquitetura do banco de dados.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-6 transition hover:bg-white/[0.1]">
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-white/10 text-sage">
+                  <Icon name="shield" width={18} height={18} />
                 </div>
+                <p className="text-sm leading-6 text-paper/80">
+                  Indicadores para a empresa são sempre agregados e anônimos, com proteção contra
+                  reidentificação em grupos pequenos.
+                </p>
               </div>
             </div>
           </div>
@@ -328,22 +375,22 @@ export default function LandingPage() {
         <section className="border-t border-border-soft">
           <div className="mx-auto max-w-6xl px-6 py-20">
             <div className="max-w-lg">
+              <p className={TAG}>Comece agora</p>
               <h2 className="font-display text-3xl text-ink">Comece de onde você está</h2>
               <p className="mt-3 text-ink-soft leading-7">O cadastro leva menos de dois minutos.</p>
             </div>
 
-            <div className="mt-10 grid gap-4 sm:grid-cols-3">
-              {[
-                { titulo: 'Sou de uma empresa', hint: 'Contratar e gerenciar o benefício' },
-                { titulo: 'Sou colaborador', hint: 'Usar o benefício da minha empresa' },
-                { titulo: 'Sou psicólogo(a)', hint: 'Atender pela plataforma' },
-              ].map((r) => (
+            <div className="mt-12 grid gap-5 sm:grid-cols-3">
+              {PAPEIS.map((r) => (
                 <Link
                   key={r.titulo}
                   href="/cadastro"
-                  className="group flex flex-col justify-between rounded-xl border border-border-soft bg-white p-6 hover:border-pine transition-colors"
+                  className="group flex flex-col justify-between rounded-2xl border border-border-soft bg-white p-7 transition hover:-translate-y-1 hover:border-pine hover:shadow-lg hover:shadow-pine/5"
                 >
                   <div>
+                    <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-pine/10 text-pine">
+                      <Icon name={r.icon} width={20} height={20} />
+                    </div>
                     <p className="font-medium text-ink">{r.titulo}</p>
                     <p className="mt-1.5 text-sm text-ink-soft">{r.hint}</p>
                   </div>
@@ -363,18 +410,17 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-border-soft">
-        <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2.5">
-            <BrandMark size={22} tone="dark" />
-            <span className="font-display text-ink">Plataforma</span>
+      <footer className="bg-ink text-paper">
+        <div className="mx-auto max-w-6xl px-6 py-14 text-center">
+          <div className="mb-3 flex items-center justify-center gap-2.5">
+            <BrandMark size={24} tone="light" />
+            <span className="font-display text-lg">Plataforma</span>
           </div>
-          <p className="text-sm text-ink-soft max-w-md">
-            Autonomia clínica sempre com o psicólogo. Conformidade com a LGPD e as normas do CFP/CRP.
-          </p>
-          <div className="flex items-center gap-5 text-sm text-ink-soft">
-            <Link href="/login" className="hover:text-ink transition-colors">Entrar</Link>
-            <Link href="/cadastro" className="hover:text-ink transition-colors">Cadastre-se</Link>
+          <p className="text-sm text-paper/50">Autonomia clínica sempre com o psicólogo.</p>
+          <p className="text-sm text-paper/50">Conformidade com a LGPD e as normas do CFP/CRP.</p>
+          <div className="mt-6 flex items-center justify-center gap-6 text-sm text-paper/70">
+            <Link href="/login" className="hover:text-paper transition-colors">Entrar</Link>
+            <Link href="/cadastro" className="hover:text-paper transition-colors">Cadastre-se</Link>
           </div>
         </div>
       </footer>

@@ -1,11 +1,17 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { AprovarPsicologoButtons } from '@/components/aprovar-psicologo-buttons'
+import { Icon } from '@/components/icon'
 
 const STATUS_LABEL: Record<string, string> = {
   pendente: 'Em análise',
   aprovado: 'Aprovado',
   rejeitado: 'Rejeitado',
+}
+
+const STATUS_STYLE: Record<string, string> = {
+  aprovado: 'bg-sage/20 text-pine',
+  rejeitado: 'bg-red-50 text-red-700',
 }
 
 export default async function AdminPsicologosPage() {
@@ -67,7 +73,7 @@ export default async function AdminPsicologosPage() {
         depois de aprovados e com assinatura ativa.
       </p>
 
-      <h2 className="font-display text-lg text-ink mt-8 mb-3">
+      <h2 className="font-display text-lg text-ink mt-10 mb-4">
         Aguardando análise ({pendentes.length})
       </h2>
 
@@ -75,32 +81,38 @@ export default async function AdminPsicologosPage() {
         <p className="text-ink-soft text-sm">Nenhum psicólogo aguardando aprovação.</p>
       )}
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         {pendentes.map((p) => {
           const perfil = perfilPorId[p.id]
           return (
             <div
               key={p.id}
-              className="rounded-xl border border-border-soft bg-white p-4 flex justify-between items-start gap-4"
+              className="flex items-start justify-between gap-4 rounded-2xl border border-border-soft bg-white p-6"
             >
-              <div>
-                <p className="text-sm font-medium text-ink">
-                  {perfil?.full_name ?? 'Sem nome'}
-                </p>
-                <p className="text-xs text-ink-soft">{perfil?.email}</p>
-                <p className="text-xs text-ink-soft mt-1">CRP: {p.crp}</p>
-                {linksDocumento[p.id] ? (
-                  <a
-                    href={linksDocumento[p.id]!}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-pine font-medium hover:underline mt-1 inline-block"
-                  >
-                    Ver documento enviado →
-                  </a>
-                ) : (
-                  <p className="text-xs text-amber mt-1">Nenhum documento enviado ainda.</p>
-                )}
+              <div className="flex items-start gap-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber/15 text-amber">
+                  <Icon name="shield" width={18} height={18} />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-ink">
+                    {perfil?.full_name ?? 'Sem nome'}
+                  </p>
+                  <p className="text-xs text-ink-soft">{perfil?.email}</p>
+                  <p className="text-xs text-ink-soft mt-1">CRP: {p.crp}</p>
+                  {linksDocumento[p.id] ? (
+                    <a
+                      href={linksDocumento[p.id]!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs text-pine font-medium hover:underline mt-2"
+                    >
+                      <Icon name="file" width={12} height={12} />
+                      Ver documento enviado
+                    </a>
+                  ) : (
+                    <p className="text-xs text-amber mt-2">Nenhum documento enviado ainda.</p>
+                  )}
+                </div>
               </div>
               <AprovarPsicologoButtons psicologoId={p.id} />
             </div>
@@ -108,15 +120,15 @@ export default async function AdminPsicologosPage() {
         })}
       </div>
 
-      <h2 className="font-display text-lg text-ink mt-10 mb-3">Já analisados</h2>
+      <h2 className="font-display text-lg text-ink mt-12 mb-4">Já analisados</h2>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         {decididos.map((p) => {
           const perfil = perfilPorId[p.id]
           return (
             <div
               key={p.id}
-              className="rounded-lg border border-border-soft bg-white px-4 py-3 flex justify-between items-center"
+              className="flex items-center justify-between gap-4 rounded-2xl border border-border-soft bg-white px-6 py-4"
             >
               <div>
                 <p className="text-sm font-medium text-ink">
@@ -125,8 +137,8 @@ export default async function AdminPsicologosPage() {
                 <p className="text-xs text-ink-soft">CRP: {p.crp}</p>
               </div>
               <span
-                className={`text-xs uppercase tracking-wide ${
-                  p.status_verificacao === 'aprovado' ? 'text-pine' : 'text-red-700'
+                className={`rounded-full px-2.5 py-1 text-xs font-medium uppercase tracking-wide ${
+                  STATUS_STYLE[p.status_verificacao] ?? 'bg-paper text-ink-soft border border-border-soft'
                 }`}
               >
                 {STATUS_LABEL[p.status_verificacao]}
@@ -138,4 +150,3 @@ export default async function AdminPsicologosPage() {
     </div>
   )
 }
-
