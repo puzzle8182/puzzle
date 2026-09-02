@@ -47,9 +47,6 @@ create table if not exists clinical.hipoteses_diagnosticas (
     descricao text,
     ativa boolean default true,
     criado_em timestamptz default now()
-    -- Sem "atualizado_em" de propósito: versionamento é feito por INSERT de uma
-    -- nova linha + soft-flag `ativa = false` na antiga, nunca por UPDATE.
-    -- Ver REVOKE implícito (não concedemos UPDATE/DELETE) mais abaixo.
 );
 
 create table if not exists clinical.intercorrencias (
@@ -74,10 +71,6 @@ create table if not exists clinical.autorizacoes_suporte (
     revogada_em timestamptz
 );
 
--- -----------------------------------------------------------------------------
--- 2. TABELA DE REPUTAÇÃO (schema `core`, não é dado clínico)
--- -----------------------------------------------------------------------------
-
 create table if not exists core.avaliacoes (
     id uuid primary key default gen_random_uuid(),
     psicologo_id uuid not null references public.profiles(id) on delete cascade,
@@ -87,10 +80,6 @@ create table if not exists core.avaliacoes (
     criado_em timestamptz default now()
 );
 
--- -----------------------------------------------------------------------------
--- 3. GRANTS EXPLÍCITOS (lição aprendida: schemas custom exigem grant manual)
--- -----------------------------------------------------------------------------
-
 grant usage on schema clinical to authenticated;
 grant usage on schema core to authenticated;
 
@@ -99,15 +88,6 @@ grant select, insert on clinical.hipoteses_diagnosticas to authenticated;
 grant select, insert on clinical.intercorrencias to authenticated;
 grant select, insert, update on clinical.autorizacoes_suporte to authenticated;
 grant select, insert, update, delete on core.avaliacoes to authenticated;
-
--- IMPORTANTE: não conceder UPDATE/DELETE em hipoteses_diagnosticas.
--- O versionamento é garantido pela ausência do privilégio, não por convenção
--- de código (diferente do 1.0, onde a policy dava ALL e dependia da aplicação
--- nunca chamar UPDATE/DELETE).
-
--- -----------------------------------------------------------------------------
--- 4. FUNÇÃO DE AUTORIZAÇÃO (portada do 1.0, ajustada pro novo schema)
--- -----------------------------------------------------------------------------
 
 create or replace function clinical.existe_autorizacao_ativa(p_colaborador_profile_id uuid)
 returns boolean
@@ -123,19 +103,11 @@ as $$
   );
 $$;
 
--- -----------------------------------------------------------------------------
--- 5. RLS — habilitar
--- -----------------------------------------------------------------------------
-
 alter table clinical.anamneses enable row level security;
 alter table clinical.hipoteses_diagnosticas enable row level security;
 alter table clinical.intercorrencias enable row level security;
 alter table clinical.autorizacoes_suporte enable row level security;
 alter table core.avaliacoes enable row level security;
-
--- -----------------------------------------------------------------------------
--- 6. POLICIES — anamneses
--- -----------------------------------------------------------------------------
 
 create policy colaborador_ve_propria_anamnese
 on clinical.anamneses for select
@@ -152,10 +124,6 @@ using (
     exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin_plataforma')
     and clinical.existe_autorizacao_ativa(colaborador_profile_id)
 );
-
--- -----------------------------------------------------------------------------
--- 7. POLICIES — hipoteses_diagnosticas (sem UPDATE/DELETE, ver GRANTs acima)
--- -----------------------------------------------------------------------------
 
 create policy colaborador_ve_proprias_hipoteses
 on clinical.hipoteses_diagnosticas for select
@@ -176,10 +144,6 @@ using (
     and clinical.existe_autorizacao_ativa(colaborador_profile_id)
 );
 
--- -----------------------------------------------------------------------------
--- 8. POLICIES — intercorrencias (CORRIGIDO: paciente só vê o que é visível)
--- -----------------------------------------------------------------------------
-
 create policy colaborador_ve_intercorrencias_visiveis
 on clinical.intercorrencias for select
 using (auth.uid() = colaborador_profile_id and visivel_colaborador = true);
@@ -193,4 +157,44 @@ create policy admin_ve_intercorrencias_autorizadas
 on clinical.intercorrencias for select
 using (
     exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin_plataforma')
-    and clinical.existe_autorizacao_ativa(colaborado
+    and clinical.existe_autorizacao_ativa(colaborador_profile_id)
+);
+
+create policy psicologo_gerencia_suas_autorizacoes
+on clinical.autorizacoes_suporte for all
+using (auth.uid() = psicologo_id)
+with check (auth.uid() = psicologo_id);
+
+create policy admin_ve_autorizacoes
+on clinical.autorizacoes_suporte for select
+using (
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin_plataforma')
+);
+
+create policy colaborador_ve_autorizacoes_sobre_si
+on clinical.autorizacoes_suporte for select
+using (auth.uid() = colaborador_profile_id);
+
+create policy colaborador_ve_proprias_avaliacoes
+on core.avaliacoes for select
+using (auth.uid() = colaborador_profile_id);
+
+create policy colaborador_avalia_apos_sessao_realizada
+on core.avaliacoes for insert
+with check (
+    auth.uid() = colaborador_profile_id
+    and exists (
+        select 1 from core.agendamentos a
+        where a.colaborador_profile_id = avaliacoes.colaborador_profile_id
+          and a.psicologo_id = avaliacoes.psicologo_id
+          and a.status = 'realizado'
+    )
+);
+
+create policy colaborador_edita_propria_avaliacao
+on core.avaliacoes for update
+using (auth.uid() = colaborador_profile_id);
+
+create policy colaborador_apaga_propria_avaliacao
+on core.avaliacoes for delete
+using (auth.uid() = colaborador_profile_id);
