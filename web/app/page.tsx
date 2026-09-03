@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { BrandMark } from '@/components/brand-mark'
 import { Icon } from '@/components/icon'
-import { HeroNetwork } from '@/components/hero-network'
+import { HeroPhoto } from '@/components/hero-photo'
 
 const TAG = 'mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-sage'
 
@@ -128,22 +128,27 @@ export default function LandingPage() {
 
       <main>
         {/* hero */}
-        <section className="mx-auto max-w-6xl px-6 pt-16 pb-20 md:pt-24 md:pb-28">
-          <div className="grid items-center gap-14 md:grid-cols-[1.1fr_0.9fr]">
-            <div>
+        <section className="relative overflow-hidden">
+          <div className="absolute inset-0">
+            <HeroPhoto />
+            <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(23,36,42,0.92)_0%,rgba(23,36,42,0.75)_38%,rgba(23,36,42,0.35)_65%,rgba(23,36,42,0.05)_100%)]" />
+          </div>
+
+          <div className="relative mx-auto max-w-6xl px-6 py-24 md:py-32">
+            <div className="max-w-xl">
               <p className="mb-5 flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-sage">
                 <span className="h-px w-8 bg-sage" />
                 Benefício corporativo de psicoterapia
               </p>
 
-              <h1 className="font-display text-[2.35rem] leading-[1.18] text-ink sm:text-5xl sm:leading-[1.15]">
-                A <span className="text-pine">empresa</span> financia o acesso.
+              <h1 className="font-display text-[2.35rem] leading-[1.18] text-paper sm:text-5xl sm:leading-[1.15]">
+                A <span className="text-sage">empresa</span> financia o acesso.
                 <br />
-                O <span className="text-pine">colaborador</span> escolhe.
-                <br />O <span className="text-pine">psicólogo</span> atende — e recebe pelo seu trabalho.
+                O <span className="text-sage">colaborador</span> escolhe.
+                <br />O <span className="text-sage">psicólogo</span> atende — e recebe pelo seu trabalho.
               </h1>
 
-              <p className="mt-6 max-w-md text-lg leading-8 text-ink-soft">
+              <p className="mt-6 max-w-md text-lg leading-8 text-paper/80">
                 Empresas, colaboradores e psicólogos em um único ecossistema: a empresa paga o
                 benefício, o colaborador escolhe livremente com quem fazer terapia, e o profissional
                 é remunerado direto pelo atendimento.
@@ -152,24 +157,17 @@ export default function LandingPage() {
               <div className="mt-9 flex flex-wrap items-center gap-4">
                 <Link
                   href="/cadastro"
-                  className="rounded-full bg-pine px-6 py-3 text-sm font-medium text-paper hover:bg-pine-dark transition-colors"
+                  className="rounded-full bg-paper px-6 py-3 text-sm font-medium text-pine hover:bg-sage/90 transition-colors"
                 >
                   Criar conta gratuita
                 </Link>
                 <a
                   href="#como-funciona"
-                  className="flex items-center gap-1.5 text-sm font-medium text-ink hover:text-pine transition-colors"
+                  className="flex items-center gap-1.5 text-sm font-medium text-paper hover:text-sage transition-colors"
                 >
                   Ver como funciona
                   <Icon name="arrow-right" width={16} height={16} />
                 </a>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-sage/25 to-pine/10" />
-              <div className="rounded-[2rem] border border-border-soft bg-white p-8 shadow-[0_24px_64px_-24px_rgba(23,36,42,0.22)] sm:p-10">
-                <HeroNetwork />
               </div>
             </div>
           </div>
