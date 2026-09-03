@@ -11,7 +11,7 @@ const PROBLEMAS = [
     quem: 'Para quem quer começar',
     titulo: 'O custo ainda decide quem começa a terapia',
     texto:
-      'Mesmo quando existe vontade de iniciar o acompanhamento, o valor das sessões pode ser o que trava a decisão — principalmente porque psicoterapia raramente se resolve em um único encontro.',
+      'Mesmo quando existe vontade de iniciar o acompanhamento, o valor das sessões pode ser o que trava a decisão, principalmente porque psicoterapia raramente se resolve em um único encontro.',
   },
   {
     icon: 'building',
@@ -32,7 +32,7 @@ const PROBLEMAS = [
 const PASSOS = [
   {
     titulo: 'A empresa contrata o benefício',
-    texto: 'Define a modalidade de financiamento — custeio integral ou coparticipação — e quem são os colaboradores elegíveis.',
+    texto: 'Define a modalidade de financiamento (custeio integral ou coparticipação) e quem são os colaboradores elegíveis.',
   },
   {
     titulo: 'O colaborador escolhe o profissional',
@@ -40,7 +40,7 @@ const PASSOS = [
   },
   {
     titulo: 'A sessão acontece e o rateio é automático',
-    texto: 'O agendamento respeita a agenda real do psicólogo, e o valor é dividido conforme o contrato da empresa — sem cálculo manual.',
+    texto: 'O agendamento respeita a agenda real do psicólogo, e o valor é dividido conforme o contrato da empresa, sem cálculo manual.',
   },
   {
     titulo: 'O psicólogo recebe e paga sua assinatura',
@@ -59,7 +59,7 @@ const PARA_QUEM = [
     titulo: 'Para empresas',
     linha: 'Um benefício de saúde mental sem montar a operação sozinha.',
     texto:
-      'A empresa entra com o financiamento — integral ou por coparticipação — e acompanha indicadores agregados de uso e investimento. O que acontece dentro da terapia nunca chega ao ambiente corporativo.',
+      'A empresa entra com o financiamento, integral ou por coparticipação, e acompanha indicadores agregados de uso e investimento. O que acontece dentro da terapia nunca chega ao ambiente corporativo.',
     bullets: ['Rede de psicólogos já formada', 'Duas modalidades de financiamento', 'Indicadores agregados, nunca individuais'],
   },
   {
@@ -77,7 +77,7 @@ const PARA_QUEM = [
     titulo: 'Para psicólogos',
     linha: 'Presença profissional, demanda corporativa e ferramentas para a prática.',
     texto:
-      'A mensalidade dá acesso à rede e à infraestrutura — não é compra de pacientes nem garante volume mínimo de atendimentos. Quem escolhe o profissional continua sendo o colaborador.',
+      'A mensalidade dá acesso à rede e à infraestrutura; não é compra de pacientes nem garante volume mínimo de atendimentos. Quem escolhe o profissional continua sendo o colaborador.',
     bullets: ['Perfil, agenda e valores sob seu controle', 'Recebimento direto pelo atendimento', 'Ferramentas de organização clínica com IA'],
   },
 ] as const
@@ -145,7 +145,7 @@ export default function LandingPage() {
                 A <span className="text-sage">empresa</span> financia o acesso.
                 <br />
                 O <span className="text-sage">colaborador</span> escolhe.
-                <br />O <span className="text-sage">psicólogo</span> atende — e recebe pelo seu trabalho.
+                <br />O <span className="text-sage">psicólogo</span> atende, e recebe pelo seu trabalho.
               </h1>
 
               <p className="mt-6 max-w-md text-lg leading-8 text-paper/80">
@@ -264,7 +264,7 @@ export default function LandingPage() {
                   <span className="rounded-full border border-border-soft bg-white px-3.5 py-1.5 text-sm text-ink">Plataforma</span>
                 </div>
                 <p className="mt-5 text-sm leading-6 text-ink-soft">
-                  Dá acesso à rede, ao perfil profissional e às ferramentas da plataforma — não é subsídio à sessão de ninguém.
+                  Dá acesso à rede, ao perfil profissional e às ferramentas da plataforma; não é subsídio à sessão de ninguém.
                 </p>
               </div>
             </div>
@@ -315,7 +315,7 @@ export default function LandingPage() {
                 </p>
                 <p className="mt-5 max-w-md text-[15px] leading-7 text-ink-soft">
                   Ao longo de meses ou anos de acompanhamento, os registros de sessão se acumulam. A
-                  tecnologia ajuda a recuperar o que já foi documentado — nunca a decidir o que ele significa.
+                  tecnologia ajuda a recuperar o que já foi documentado; nunca a decidir o que ele significa.
                 </p>
               </div>
 
@@ -352,7 +352,7 @@ export default function LandingPage() {
                   <Icon name="lock" width={18} height={18} />
                 </div>
                 <p className="text-sm leading-6 text-paper/80">
-                  Dados clínicos e dados corporativos vivem em ambientes tecnicamente separados —
+                  Dados clínicos e dados corporativos vivem em ambientes tecnicamente separados:
                   não é apenas uma regra de negócio, é a arquitetura do banco de dados.
                 </p>
               </div>

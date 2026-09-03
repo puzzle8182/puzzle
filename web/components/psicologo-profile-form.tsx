@@ -50,7 +50,7 @@ const MODALIDADES = [
 const VERIFICACAO_LABEL: Record<string, string> = {
   pendente: 'Em análise',
   aprovado: 'Aprovado',
-  rejeitado: 'Rejeitado — reenvie o documento',
+  rejeitado: 'Rejeitado: reenvie o documento',
 }
 
 function disponibilidadeParaMapa(
@@ -163,7 +163,7 @@ export function PsicologoProfileForm({
 
       <div className="mb-6 rounded-2xl border border-border-soft bg-white p-6">
         <p className="text-sm text-ink-soft mb-3">
-          Foto de perfil — aparece para colaboradores na busca.
+          Foto de perfil: aparece para colaboradores na busca.
         </p>
         <AvatarUpload fotoUrl={fotoUrl} nome={nome} />
       </div>
@@ -239,7 +239,7 @@ export function PsicologoProfileForm({
             name="formacao"
             rows={3}
             defaultValue={perfil?.formacao?.join('\n') ?? ''}
-            placeholder={'Uma formação por linha, ex:\nGraduação em Psicologia — USP (2015)\nEspecialização em TCC — PUC-SP (2018)'}
+            placeholder={'Uma formação por linha, ex:\nGraduação em Psicologia, USP (2015)\nEspecialização em TCC, PUC-SP (2018)'}
             className="w-full rounded-lg border border-border-soft bg-white px-3.5 py-2.5 text-ink outline-none focus:ring-2 focus:ring-sage resize-none"
           />
         </div>

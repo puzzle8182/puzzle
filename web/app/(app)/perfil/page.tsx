@@ -40,11 +40,11 @@ export default async function PerfilPage() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="rounded-xl bg-paper p-4">
             <p className="text-sm text-ink-soft mb-1">Nome</p>
-            <p className="font-medium text-ink">{profile?.full_name ?? '—'}</p>
+            <p className="font-medium text-ink">{profile?.full_name ?? 'Não informado'}</p>
           </div>
           <div className="rounded-xl bg-paper p-4">
             <p className="text-sm text-ink-soft mb-1">E-mail</p>
-            <p className="font-medium text-ink">{profile?.email ?? '—'}</p>
+            <p className="font-medium text-ink">{profile?.email ?? 'Não informado'}</p>
           </div>
         </div>
       </div>

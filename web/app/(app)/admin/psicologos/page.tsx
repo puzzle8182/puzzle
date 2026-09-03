@@ -69,7 +69,7 @@ export default async function AdminPsicologosPage() {
     <div>
       <h1 className="font-display text-3xl text-ink">Aprovação de psicólogos</h1>
       <p className="text-ink-soft mt-2">
-        Verifique o CRP antes de aprovar — psicólogos só aparecem na busca
+        Verifique o CRP antes de aprovar; psicólogos só aparecem na busca
         depois de aprovados e com assinatura ativa.
       </p>
 
