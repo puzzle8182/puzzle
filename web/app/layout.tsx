@@ -16,7 +16,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Plataforma Puzzle',
-  description: 'Acesso à psicoterapia e inteligência clínica.',
+  description: 'Acesso à psicoterapia, com estatísticas e gráficos de acompanhamento.',
 }
 
 export default function RootLayout({

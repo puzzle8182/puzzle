@@ -78,14 +78,14 @@ const PARA_QUEM = [
     linha: 'Presença profissional, demanda corporativa e ferramentas para a prática.',
     texto:
       'A mensalidade dá acesso à rede e à infraestrutura; não é compra de pacientes nem garante volume mínimo de atendimentos. Quem escolhe o profissional continua sendo o colaborador.',
-    bullets: ['Perfil, agenda e valores sob seu controle', 'Recebimento direto pelo atendimento', 'Ferramentas de organização clínica com IA'],
+    bullets: ['Perfil, agenda e valores sob seu controle', 'Recebimento direto pelo atendimento', 'Estatísticas e gráficos de acompanhamento clínico'],
   },
 ] as const
 
 const INTELIGENCIA = [
-  'Registros organizados cronologicamente por paciente',
-  'Recuperação rápida de temas já documentados',
+  'Gráficos de progresso por objetivo terapêutico',
   'Linha do tempo do acompanhamento',
+  'Estatísticas de frequência das sessões',
   'Painéis que separam registro de interpretação clínica',
 ]
 
@@ -307,18 +307,19 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* inteligência clínica */}
+        {/* organização inteligente */}
         <section className="border-t border-border-soft bg-white">
           <div className="mx-auto max-w-6xl px-6 py-20">
             <div className="grid gap-12 md:grid-cols-2 md:items-center">
               <div>
-                <p className={TAG}>Inteligência clínica</p>
+                <p className={TAG}>Organização inteligente</p>
                 <p className="font-display text-3xl italic leading-snug text-ink sm:text-4xl">
-                  A IA organiza. Quem interpreta é o psicólogo.
+                  Estatísticas organizam. Quem interpreta é o psicólogo.
                 </p>
                 <p className="mt-5 max-w-md text-[15px] leading-7 text-ink-soft">
                   Ao longo de meses ou anos de acompanhamento, os registros de sessão se acumulam. A
-                  tecnologia ajuda a recuperar o que já foi documentado; nunca a decidir o que ele significa.
+                  plataforma transforma isso em gráficos e estatísticas; não em inteligência artificial,
+                  e nunca em decisão sobre o que eles significam.
                 </p>
               </div>
 
@@ -329,7 +330,7 @@ export default function LandingPage() {
                     className="flex items-start gap-4 rounded-xl border border-border-soft bg-paper p-5 transition hover:border-pine/40"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sage/25 text-pine">
-                      <Icon name="brain" width={18} height={18} />
+                      <Icon name="chart" width={18} height={18} />
                     </div>
                     <span className="mt-1.5 text-[15px] leading-6 text-ink">{f}</span>
                   </div>
