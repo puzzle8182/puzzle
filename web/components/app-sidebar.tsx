@@ -12,13 +12,15 @@ export function AppSidebar({ role }: { role: AppRole }) {
 
   return (
     <aside className="flex h-screen w-64 shrink-0 flex-col bg-pine text-paper">
-      <div className="flex items-center gap-3 px-6 py-6">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10">
-          <BrandMark size={26} />
+      <div className="flex items-center gap-2.5 px-5 py-6">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
+          <BrandMark size={22} />
         </div>
-        <div>
-          <p className="font-display text-lg leading-none">Plataforma</p>
-          <p className="text-xs text-sage mt-1">{ROLE_LABEL[role]}</p>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/puzzle-logo.webp" alt="Puzzle" className="h-7 w-auto shrink-0" />
+        <div className="min-w-0">
+          <p className="font-display text-base leading-tight truncate">Plataforma Puzzle</p>
+          <p className="text-xs text-sage mt-0.5">{ROLE_LABEL[role]}</p>
         </div>
       </div>
 

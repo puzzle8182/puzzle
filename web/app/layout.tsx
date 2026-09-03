@@ -15,7 +15,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Plataforma',
+  title: 'Plataforma Puzzle',
   description: 'Acesso à psicoterapia e inteligência clínica.',
 }
 

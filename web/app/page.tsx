@@ -101,9 +101,12 @@ export default function LandingPage() {
       {/* nav */}
       <header className="sticky top-0 z-40 border-b border-border-soft bg-paper/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-3">
             <BrandMark size={28} tone="dark" />
-            <span className="font-display text-lg text-ink">Plataforma</span>
+            <span className="h-6 w-px bg-border-soft" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/puzzle-logo.webp" alt="Puzzle" className="h-7 w-auto" />
+            <span className="font-display text-lg text-ink">Plataforma Puzzle</span>
           </Link>
 
           <nav className="hidden items-center gap-7 text-sm text-ink-soft md:flex">
@@ -410,9 +413,12 @@ export default function LandingPage() {
 
       <footer className="bg-ink text-paper">
         <div className="mx-auto max-w-6xl px-6 py-14 text-center">
-          <div className="mb-3 flex items-center justify-center gap-2.5">
+          <div className="mb-3 flex items-center justify-center gap-3">
             <BrandMark size={24} tone="light" />
-            <span className="font-display text-lg">Plataforma</span>
+            <span className="h-5 w-px bg-paper/20" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/puzzle-logo.webp" alt="Puzzle" className="h-6 w-auto" />
+            <span className="font-display text-lg">Plataforma Puzzle</span>
           </div>
           <p className="text-sm text-paper/50">Autonomia clínica sempre com o psicólogo.</p>
           <p className="text-sm text-paper/50">Conformidade com a LGPD e as normas do CFP/CRP.</p>
