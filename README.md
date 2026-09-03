@@ -38,10 +38,13 @@ Três schemas segregam fisicamente o que é corporativo do que é clínico:
 
 - **`corporate`** — empresas, contratos, colaboradores elegíveis, faturas.
   Tudo que a empresa pode enxergar (dado administrativo/financeiro).
-- **`clinical`** — psicólogos, prontuário (notas de sessão), objetivos
-  terapêuticos. **Nenhuma policy de RLS dá acesso a `empresa_admin` aqui.**
-- **`core`** — agendamentos e os dois fluxos financeiros (sessão e
-  assinatura). Não é clínico, mas também não pertence só à empresa.
+- **`clinical`** — psicólogos, prontuário (notas de sessão, anamnese,
+  hipóteses diagnósticas versionadas, intercorrências, objetivos
+  terapêuticos, autorizações de suporte). **Nenhuma policy de RLS dá
+  acesso a `empresa_admin` aqui.**
+- **`core`** — agendamentos, os dois fluxos financeiros (sessão e
+  assinatura) e avaliações de reputação do psicólogo. Não é clínico, mas
+  também não pertence só à empresa.
 
 A única porta de acesso da empresa a qualquer dado derivado de sessão é a
 função `corporate.get_indicadores_empresa()`, que embute a proteção de
@@ -55,6 +58,15 @@ INSERT diretas — isso evita espalhar lógica de negócio pela RLS e permite
 consultar `auth.users` (normalmente inacessível ao cliente) de forma
 controlada.
 
+Acesso administrativo a dado clínico (ex.: suporte investigando um
+problema) segue o mesmo princípio: nunca é permanente. A tabela
+`clinical.autorizacoes_suporte` registra motivo e expiração (padrão de 7
+dias), e `clinical.existe_autorizacao_ativa()` (`security definer`)
+condiciona toda policy de `admin_plataforma` sobre dado clínico à
+existência de uma autorização ativa. O colaborador tem visibilidade sobre
+essas autorizações concedidas sobre o próprio prontuário, mesmo sem poder
+revogá-las diretamente (só o psicólogo concede/revoga).
+
 ## Estado atual (testado de ponta a ponta)
 
 ✅ Schema completo aplicado via migrations versionadas (`supabase/migrations/`)
@@ -64,14 +76,22 @@ controlada.
 ✅ Psicólogo: formulário de perfil profissional (CRP, abordagem, bio, áreas
   de atuação, valor da sessão) + editor de disponibilidade semanal
 ✅ Colaborador: busca de psicólogos, agendamento de sessão restrito aos
-  horários reais de disponibilidade do psicólogo, com cálculo automático
-  do rateio financeiro, lista de agendamentos
+  horários reais de disponibilidade do psicólogo (validado no servidor,
+  não confia no formulário), com cálculo automático do rateio financeiro,
+  lista de agendamentos
+✅ Conflito de horário na agenda: índice único parcial no banco
+  (`agendamentos_sem_conflito_horario`) impede dois colaboradores
+  reservando o mesmo horário com o mesmo psicólogo, mesmo em caso de
+  requisições simultâneas (condição de corrida) — a Server Action dá uma
+  checagem prévia amigável, mas a garantia real é a constraint no banco
 ✅ Empresa: cadastro da própria empresa (nome, CNPJ, modalidade de
   financiamento), gestão de colaboradores elegíveis (adicionar por e-mail,
   listar com status)
 ✅ Prontuário clínico: psicólogo vê lista de pacientes (colaboradores com
-  quem já teve sessão), registra uma nota por sessão, com log de auditoria
-  de acesso
+  quem já teve sessão), registra uma nota por sessão, registra anamnese
+  (queixa principal, histórico clínico/familiar/laboral, rede de apoio,
+  objetivos e intercorrências iniciais — uma por par colaborador+
+  psicólogo, editável), tudo com log de auditoria de acesso
 ✅ Verificação de documentação: psicólogo envia comprovante do CRP
   (upload para Supabase Storage, bucket privado); responsável técnico
   (papel `admin_plataforma`) aprova ou rejeita antes do perfil aparecer
@@ -105,20 +125,43 @@ Vale documentar porque são armadilhas comuns de RLS no Postgres/Supabase:
    pacientes. Corrigido com policy análoga baseada em vínculo de
    agendamento.
 
+### Lições da portabilidade do protótipo 1.0 (`micaelsonnen/Puzzle`)
+
+O prontuário inteligente (anamnese, hipóteses diagnósticas, intercorrências)
+foi portado de um protótipo anterior, adaptado ao modelo de schemas
+separados do 2.0. A auditoria da RLS original revelou padrões a evitar:
+
+1. **Coluna de visibilidade não aplicada na policy:** a tabela original
+   tinha uma flag `visivel_paciente`, mas a policy de `SELECT` do paciente
+   ignorava essa flag e liberava todas as linhas. Corrigido incluindo a
+   condição diretamente na cláusula `USING`.
+2. **Duas policies permissivas de `INSERT` no mesmo comando se somam por
+   OR, não por AND:** existiam duas regras de inserção em uma tabela — uma
+   exigia sessão concluída, a outra não — e a segunda anulava a proteção
+   da primeira. Consolidado em uma única policy.
+3. **`FOR ALL` concedia UPDATE/DELETE onde o negócio exige versionamento
+   apenas por INSERT:** hipóteses diagnósticas devem ser sempre
+   preservadas (soft-flag `ativa = false` na antiga + nova linha), nunca
+   sobrescritas. Corrigido restringindo a policy a `SELECT`+`INSERT` e
+   **não concedendo `UPDATE`/`DELETE`** — o versionamento agora é
+   garantido por ausência de privilégio, não por convenção de código.
+4. **Tabela de autorização de acesso sem visibilidade para o titular do
+   dado:** o paciente não tinha nenhuma policy sobre a tabela que registra
+   quem acessou seu prontuário. Adicionada uma policy de `SELECT` para o
+   colaborador ver autorizações concedidas sobre si mesmo (LGPD).
+
 ## O que ainda falta (gaps conhecidos)
 
 - **Cobrança/billing:** a mensalidade do psicólogo (R$ 150) e o pagamento
   da sessão ainda não têm Edge Functions de integração com gateway de
   pagamento. Hoje a ativação da assinatura (`status_assinatura = 'ativa'`)
-  precisa ser feita manualmente.
+  precisa ser feita manualmente. A estrutura de rateio (`valor_empresa`,
+  `valor_colaborador`, `gateway_transaction_id` em
+  `core.pagamentos_sessao`) já existe, falta a integração real.
 - **Confirmação de e-mail:** desativada temporariamente nas configurações
   do Supabase para agilizar testes — **reativar antes de qualquer uso
   real**, e configurar um provedor de e-mail transacional (o padrão do
   Supabase é só para testes, com limite de envio baixo).
-- **Conflito de horário na agenda:** a validação hoje garante que o
-  horário está dentro da disponibilidade declarada pelo psicólogo, mas
-  não impede que dois colaboradores agendem o mesmo horário exato (falta
-  checar se já existe um agendamento conflitante naquele slot).
 - **Convite de colaborador antes do cadastro:** hoje o RH só consegue
   adicionar um colaborador que já existe na plataforma (com conta criada
   e papel "colaborador"). Não existe fluxo de convite por e-mail para
@@ -135,6 +178,11 @@ Vale documentar porque são armadilhas comuns de RLS no Postgres/Supabase:
   alguém com acesso ao banco roda um `UPDATE` no SQL Editor pra promover
   a conta. Funciona para um responsável técnico único, mas não escala
   para múltiplos admins nem tem trilha de auditoria de quem promoveu quem.
+- **Linha do tempo/painel longitudinal do prontuário:** os dados
+  estruturados (anamnese, hipóteses, intercorrências, notas de sessão)
+  existem, mas ainda não há uma visualização consolidada em ordem
+  cronológica — hoje cada tipo de registro aparece em sua própria seção
+  na página do prontuário.
 
 ## Questões regulatórias em aberto (LGPD/CFP)
 
