@@ -78,18 +78,20 @@ export async function adicionarColaborador(formData: FormData) {
     return { error: error.message }
   }
 
-  if (data === 'nao_encontrado') {
-    return {
-      error:
-        'Nenhuma conta encontrada com esse e-mail. Peça para a pessoa se cadastrar na plataforma primeiro, escolhendo "Sou colaborador".',
-    }
-  }
-
   if (data === 'nao_e_colaborador') {
     return { error: 'Essa conta não está cadastrada como colaborador.' }
   }
 
   revalidatePath('/colaboradores')
-  return { success: true }
-}
 
+  // A função devolve 'convite_criado' quando o e-mail ainda não tem conta:
+  // fica registrado em corporate.convites_colaborador e é vinculado
+  // automaticamente (via trigger no cadastro) quando a pessoa se cadastrar
+  // com esse mesmo e-mail. Não é um vínculo imediato, então a UI precisa
+  // deixar isso claro em vez de dizer "colaborador adicionado".
+  if (data === 'convite_criado') {
+    return { success: true, tipo: 'convite' as const }
+  }
+
+  return { success: true, tipo: 'vinculado' as const }
+}

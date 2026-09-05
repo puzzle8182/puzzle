@@ -9,11 +9,11 @@ export function AdicionarColaboradorForm({ empresaId }: { empresaId: string }) {
   const formRef = useRef<HTMLFormElement>(null)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
+  const [sucessoTipo, setSucessoTipo] = useState<'vinculado' | 'convite' | null>(null)
 
   function handleSubmit(formData: FormData) {
     setError(null)
-    setSuccess(false)
+    setSucessoTipo(null)
     formData.set('empresaId', empresaId)
 
     startTransition(async () => {
@@ -22,7 +22,7 @@ export function AdicionarColaboradorForm({ empresaId }: { empresaId: string }) {
         setError(result.error)
         return
       }
-      setSuccess(true)
+      setSucessoTipo(result?.tipo ?? 'vinculado')
       formRef.current?.reset()
       router.refresh()
     })
@@ -52,12 +52,18 @@ export function AdicionarColaboradorForm({ empresaId }: { empresaId: string }) {
           {error}
         </p>
       )}
-      {success && (
+      {sucessoTipo === 'vinculado' && (
         <p className="mt-3 text-sm text-pine font-medium">
-          Colaborador adicionado com sucesso.
+          Colaborador vinculado com sucesso.
+        </p>
+      )}
+      {sucessoTipo === 'convite' && (
+        <p className="mt-3 text-sm text-amber bg-amber/10 rounded-lg px-3.5 py-2.5">
+          Essa pessoa ainda não tem conta na plataforma. Um convite foi
+          registrado — assim que ela se cadastrar com esse e-mail escolhendo
+          &quot;Sou colaborador&quot;, será vinculada à empresa automaticamente.
         </p>
       )}
     </div>
   )
 }
-

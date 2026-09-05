@@ -59,12 +59,21 @@ export default async function ColaboradoresPage() {
     .eq('id', vinculo.empresa_id)
     .single()
 
-  const { data: colaboradores } = await supabase
-    .schema('corporate')
-    .from('colaboradores_elegiveis')
-    .select('id, profile_id, ativo, created_at')
-    .eq('empresa_id', vinculo.empresa_id)
-    .order('created_at', { ascending: false })
+  const [{ data: colaboradores }, { data: convitesPendentes }] = await Promise.all([
+    supabase
+      .schema('corporate')
+      .from('colaboradores_elegiveis')
+      .select('id, profile_id, ativo, created_at')
+      .eq('empresa_id', vinculo.empresa_id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .schema('corporate')
+      .from('convites_colaborador')
+      .select('id, email, created_at')
+      .eq('empresa_id', vinculo.empresa_id)
+      .eq('status', 'pendente')
+      .order('created_at', { ascending: false }),
+  ])
 
   const profileIds = (colaboradores ?? []).map((c) => c.profile_id)
 
@@ -97,13 +106,34 @@ export default async function ColaboradoresPage() {
         <AdicionarColaboradorForm empresaId={vinculo.empresa_id} />
       </div>
 
+      {convitesPendentes && convitesPendentes.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-display text-lg text-ink mb-4">
+            Convites pendentes ({convitesPendentes.length})
+          </h2>
+          <div className="flex flex-col gap-3">
+            {convitesPendentes.map((c) => (
+              <div
+                key={c.id}
+                className="flex items-center justify-between gap-4 rounded-2xl border border-dashed border-border-soft bg-paper px-6 py-4"
+              >
+                <p className="text-sm text-ink">{c.email}</p>
+                <span className="rounded-full bg-amber/15 text-amber px-2.5 py-1 text-xs font-medium uppercase tracking-wide">
+                  Aguardando cadastro
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mt-8">
         <h2 className="font-display text-lg text-ink mb-4">
           Colaboradores ({colaboradores?.length ?? 0})
         </h2>
 
         {(!colaboradores || colaboradores.length === 0) && (
-          <p className="text-ink-soft text-sm">Nenhum colaborador adicionado ainda.</p>
+          <p className="text-ink-soft text-sm">Nenhum colaborador vinculado ainda.</p>
         )}
 
         <div className="flex flex-col gap-3">
