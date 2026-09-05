@@ -31,6 +31,9 @@ infraestrutura da plataforma).
 - **Frontend:** Next.js 16 (App Router) + TypeScript + Tailwind CSS
 - **Autenticação:** Supabase Auth (`@supabase/ssr`), com 4 papéis:
   `empresa_admin`, `colaborador`, `psicologo`, `admin_plataforma`
+- **Videochamada:** Daily.co, via chamadas assíncronas do Postgres
+  (`pg_net`) — nenhuma dependência de vídeo no frontend além de um
+  `<iframe>`
 
 ## Estrutura do banco de dados
 
@@ -43,8 +46,9 @@ Três schemas segregam fisicamente o que é corporativo do que é clínico:
   terapêuticos, autorizações de suporte). **Nenhuma policy de RLS dá
   acesso a `empresa_admin` aqui.**
 - **`core`** — agendamentos, os dois fluxos financeiros (sessão e
-  assinatura) e avaliações de reputação do psicólogo. Não é clínico, mas
-  também não pertence só à empresa.
+  assinatura), avaliações de reputação do psicólogo e as salas de vídeo
+  (`salas_video`, `video_requests`). Não é clínico, mas também não
+  pertence só à empresa.
 
 A única porta de acesso da empresa a qualquer dado derivado de sessão é a
 função `corporate.get_indicadores_empresa()`, que embute a proteção de
@@ -67,6 +71,23 @@ existência de uma autorização ativa. O colaborador tem visibilidade sobre
 essas autorizações concedidas sobre o próprio prontuário, mesmo sem poder
 revogá-las diretamente (só o psicólogo concede/revoga).
 
+### Videochamada: sala criada sob demanda, nunca reaproveitada indevidamente
+
+`core.salas_video` e `core.video_requests` não têm nenhuma policy de
+`SELECT`/`INSERT` para `authenticated` — todo acesso passa por funções
+`security definer` (`iniciar_criar_sala`, `checar_criar_sala`,
+`iniciar_criar_token`, `checar_criar_token`, `obter_sala_video`), que
+fazem sua própria checagem de participação no agendamento antes de
+qualquer leitura ou escrita. Como o Postgres não faz chamadas HTTP de
+forma síncrona, a criação de sala/token no Daily.co segue um padrão de
+"iniciar + checar": `iniciar_*` dispara a chamada via `pg_net` e devolve
+um `request_id`; o frontend consulta `checar_*` em polling até a resposta
+chegar. Um pedido de criação de sala recente (< 30s) é reaproveitado por
+qualquer participante que chame `iniciar_criar_sala` nesse intervalo, para
+evitar que dois pedidos simultâneos colidam na API do Daily.co. A chave
+da API fica no Vault (`daily_api_key`), nunca em código ou variável de
+ambiente do frontend.
+
 ## Estado atual (testado de ponta a ponta)
 
 ✅ Schema completo aplicado via migrations versionadas (`supabase/migrations/`)
@@ -87,15 +108,29 @@ revogá-las diretamente (só o psicólogo concede/revoga).
 ✅ Empresa: cadastro da própria empresa (nome, CNPJ, modalidade de
   financiamento), gestão de colaboradores elegíveis (adicionar por e-mail,
   listar com status)
+✅ Agenda unificada (`/agendamentos`): a mesma página serve colaborador e
+  psicólogo, filtrando por papel — antes só existia a visão do colaborador
 ✅ Prontuário clínico: psicólogo vê lista de pacientes (colaboradores com
   quem já teve sessão), registra uma nota por sessão, registra anamnese
   (queixa principal, histórico clínico/familiar/laboral, rede de apoio,
   objetivos e intercorrências iniciais — uma por par colaborador+
   psicólogo, editável), tudo com log de auditoria de acesso
+✅ Página `/prontuarios`: visão agregada do próprio psicólogo (total de
+  pacientes com prontuário, anamneses registradas, hipóteses diagnósticas
+  ativas, notas de sessão no mês), com lista de pacientes linkando para o
+  prontuário individual de cada um
+✅ Página `/financeiro` do psicólogo: extrato de pagamentos por sessão
+  (`core.pagamentos_sessao`) com status (pago/pendente/falhou/estornado) e
+  status da assinatura da plataforma
 ✅ Verificação de documentação: psicólogo envia comprovante do CRP
   (upload para Supabase Storage, bucket privado); responsável técnico
   (papel `admin_plataforma`) aprova ou rejeita antes do perfil aparecer
   na busca — separado do status de assinatura (financeiro)
+🟡 Videochamada via Daily.co: backend completo e testado de ponta a ponta
+  (criação de sala real, geração de token, `<iframe>` carregando a sala) —
+  bloqueado apenas pela exigência do Daily.co de forma de pagamento
+  cadastrada na conta para efetivamente entrar em uma sala, mesmo dentro
+  do free tier (10.000 min/mês). Ver seção de gaps.
 
 ### Bugs reais encontrados e corrigidos durante o desenvolvimento
 
@@ -124,12 +159,18 @@ Vale documentar porque são armadilhas comuns de RLS no Postgres/Supabase:
    bug anterior — o psicólogo não conseguia ver nome/e-mail dos próprios
    pacientes. Corrigido com policy análoga baseada em vínculo de
    agendamento.
+6. **Link "Agenda" do psicólogo apontava para `/dashboard`:** um item de
+   navegação (`lib/nav-config.ts`) ficou desatualizado depois que
+   `/agendamentos` passou a servir os dois papéis — o psicólogo nunca
+   conseguia chegar na própria agenda pelo menu lateral. Corrigido
+   apontando para a rota certa.
 
 ### Lições da portabilidade do protótipo 1.0 (`micaelsonnen/Puzzle`)
 
 O prontuário inteligente (anamnese, hipóteses diagnósticas, intercorrências)
-foi portado de um protótipo anterior, adaptado ao modelo de schemas
-separados do 2.0. A auditoria da RLS original revelou padrões a evitar:
+e a videochamada via Daily.co foram portados de um protótipo anterior,
+adaptados ao modelo de schemas separados do 2.0. A auditoria da RLS
+original revelou padrões a evitar:
 
 1. **Coluna de visibilidade não aplicada na policy:** a tabela original
    tinha uma flag `visivel_paciente`, mas a policy de `SELECT` do paciente
@@ -149,19 +190,33 @@ separados do 2.0. A auditoria da RLS original revelou padrões a evitar:
    dado:** o paciente não tinha nenhuma policy sobre a tabela que registra
    quem acessou seu prontuário. Adicionada uma policy de `SELECT` para o
    colaborador ver autorizações concedidas sobre si mesmo (LGPD).
+5. **Identificação por `auth.jwt() ->> 'email'` em vez de `auth.uid()`:**
+   todas as funções de vídeo do 1.0 comparavam e-mail do JWT com colunas
+   de e-mail em tabelas de psicólogo/paciente — frágil se o e-mail mudar
+   sem sincronizar. Portado para `auth.uid()` comparado direto contra
+   `psicologo_id`/`colaborador_profile_id`, mesmo padrão já usado no
+   resto do 2.0.
 
 ## O que ainda falta (gaps conhecidos)
 
+- **Videochamada — forma de pagamento no Daily.co:** o backend está
+  pronto e testado (sala real criada, token gerado, iframe carregando),
+  mas o Daily.co exige uma forma de pagamento cadastrada na conta para
+  efetivamente entrar em uma sala, mesmo dentro do free tier. Decisão
+  consciente de aguardar a compra do domínio da empresa antes de
+  cadastrar cartão, para resolver os dois de uma vez.
 - **Cobrança/billing:** a mensalidade do psicólogo (R$ 150) e o pagamento
   da sessão ainda não têm Edge Functions de integração com gateway de
   pagamento. Hoje a ativação da assinatura (`status_assinatura = 'ativa'`)
   precisa ser feita manualmente. A estrutura de rateio (`valor_empresa`,
   `valor_colaborador`, `gateway_transaction_id` em
-  `core.pagamentos_sessao`) já existe, falta a integração real.
-- **Confirmação de e-mail:** desativada temporariamente nas configurações
-  do Supabase para agilizar testes — **reativar antes de qualquer uso
-  real**, e configurar um provedor de e-mail transacional (o padrão do
-  Supabase é só para testes, com limite de envio baixo).
+  `core.pagamentos_sessao`) já existe, falta a integração real. Também
+  aguardando CNPJ.
+- **Confirmação de e-mail:** já reativada no Supabase Auth. Falta
+  configurar um provedor de e-mail transacional (o padrão do Supabase é
+  só para testes, com limite de envio baixo) — o 1.0 já validou esse
+  fluxo com Resend, mas depende do mesmo domínio próprio mencionado acima
+  para verificação de envio.
 - **Convite de colaborador antes do cadastro:** hoje o RH só consegue
   adicionar um colaborador que já existe na plataforma (com conta criada
   e papel "colaborador"). Não existe fluxo de convite por e-mail para
@@ -169,10 +224,8 @@ separados do 2.0. A auditoria da RLS original revelou padrões a evitar:
 - **Indicadores da empresa no frontend:** a função
   `corporate.get_indicadores_empresa()` existe e tem proteção de grupo
   mínimo, mas ainda não tem tela no frontend (`/indicadores` na sidebar
-  ainda não foi implementada).
-- **Financeiro do psicólogo no frontend:** idem — a tabela
-  `core.pagamentos_sessao` existe, mas a tela `/financeiro` ainda não
-  mostra nada.
+  ainda não foi implementada). Estatísticas de fluência do tratamento
+  (sem dado clínico sensível) — próximo item da fila.
 - **Criação de conta `admin_plataforma` é manual:** não existe fluxo de
   convite seguro — hoje a pessoa se cadastra com qualquer papel e depois
   alguém com acesso ao banco roda um `UPDATE` no SQL Editor pra promover
